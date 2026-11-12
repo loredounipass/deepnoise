@@ -2125,7 +2125,8 @@ class DeepNoiseGUI:
                         height=32,
                     )
                     dpg.bind_item_theme("footer_tiktok_btn", self.theme_icon_btn)
-                    dpg.set_item_tooltip("footer_tiktok_btn", "TikTok — click here")
+                    with dpg.tooltip(parent="footer_tiktok_btn"):
+                        dpg.add_text("TikTok — click here")
                 else:
                     dpg.add_button(
                         label="TikTok click here",
@@ -2146,7 +2147,8 @@ class DeepNoiseGUI:
                         height=32,
                     )
                     dpg.bind_item_theme("footer_instagram_btn", self.theme_icon_btn)
-                    dpg.set_item_tooltip("footer_instagram_btn", "Instagram — click here")
+                    with dpg.tooltip(parent="footer_instagram_btn"):
+                        dpg.add_text("Instagram — click here")
                 else:
                     dpg.add_button(
                         label="Instagram click here",
