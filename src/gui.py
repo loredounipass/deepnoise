@@ -278,6 +278,13 @@ class DeepNoiseGUI:
 
         ensure_app_icon_ico()
 
+        # Ensure Start Menu shortcut and Windows Recent registration
+        try:
+            from src.shortcut import ensure_shortcut_and_recent
+            ensure_shortcut_and_recent()
+        except Exception as e:
+            print(f"[WARN] Failed to configure shortcut / recent: {e}")
+
         # 1. Detect and apply monitor DPI scaling
         self.dpi, self.dpi_scale = init_dpi_awareness()
         print(f"[GUI] Active Monitor DPI: {self.dpi} (DPI Scale: {self.dpi_scale:.2f}x)")

@@ -78,8 +78,8 @@ Source: "README.md"; DestDir: "{app}"; Flags: ignoreversion
 Source: "deepnoise.ico"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
-Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; IconFilename: "{app}\deepnoise.ico"
-Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; IconFilename: "{app}\deepnoise.ico"; Tasks: desktopicon
+Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; IconFilename: "{app}\deepnoise.ico"; AppUserModelID: "deepnoise.ai.noisecancellation.1"
+Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; IconFilename: "{app}\deepnoise.ico"; Tasks: desktopicon; AppUserModelID: "deepnoise.ai.noisecancellation.1"
 
 [InstallDelete]
 Type: files; Name: "{autoprograms}\DeepNoise Uninstaller.lnk"
