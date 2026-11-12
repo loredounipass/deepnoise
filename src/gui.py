@@ -268,42 +268,6 @@ def create_tray_icon_image(is_active: bool = False) -> Image.Image:
     return canvas
 
 
-def _make_social_icon(kind: str, size: int = 32) -> Image.Image:
-    """Generate a social media icon image with PIL (no external assets required)."""
-    img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(img)
-
-    if kind == "tiktok":
-        cx, cy = size // 2, size // 2
-        r = size // 2 - 2
-        draw.ellipse((2, 2, size - 2, size - 2), fill=(0, 0, 0, 255))
-        # stylized music note in white
-        draw.ellipse((cx - 5, cy - 7, cx, cy + 1), fill=(255, 255, 255, 255))
-        draw.rectangle((cx + 1, cy - 1, cx + 5, cy + 5), fill=(255, 255, 255, 255))
-        draw.ellipse((cx - 2, cy + 5, cx + 2, cy + 11), fill=(255, 255, 255, 255))
-    elif kind == "instagram":
-        # gradient-ish rounded square background (pink -> orange)
-        for i in range(size):
-            for j in range(size):
-                t = (i + j) / (2 * size)
-                r = int(225 * (1 - t) + 255 * t)
-                g = int(48 * (1 - t) + 145 * t)
-                b = int(108 * (1 - t) + 50 * t)
-                draw.point((i, j), fill=(r, g, b, 255))
-        draw.rounded_rectangle((2, 2, size - 2, size - 2), radius=max(2, size // 5), fill=(255, 255, 255, 0))
-        # camera body
-        pad = size * 0.22
-        draw.rounded_rectangle((pad, pad, size - pad, size - pad), radius=max(1, size // 10), fill=(255, 255, 255, 255))
-        # lens circle
-        lens = size * 0.32
-        draw.ellipse((size / 2 - lens / 2, size / 2 - lens / 2, size / 2 + lens / 2, size / 2 + lens / 2), fill=(255, 255, 255, 0), outline=(225, 48, 108, 255), width=max(1, size // 12))
-        # flash dot
-        dot = size * 0.09
-        draw.ellipse((size - size * 0.28 - dot / 2, size * 0.28 - dot / 2, size - size * 0.28 + dot / 2, size * 0.28 + dot / 2), fill=(255, 255, 255, 255))
-
-    return img
-
-
 def _image_to_dpg_texture(img: Image.Image) -> list:
     """Convert a PIL RGBA image to a Dear PyGui static texture data list (floats 0-1)."""
     img = img.convert("RGBA")
@@ -1660,11 +1624,18 @@ class DeepNoiseGUI:
             except Exception as e:
                 print(f"[WARN] Failed to load icon texture: {e}")
 
-        # --- SOCIAL ICON TEXTURES (generated with PIL) ---
+        # --- SOCIAL ICON TEXTURES (from original assets in root) ---
         self.social_textures = {}
-        for kind, tag in (("tiktok", "icon_tiktok"), ("instagram", "icon_instagram")):
+        social_assets = {
+            "tiktok": ("icon_tiktok", os.path.join(APP_DIR, "tiktok.avif")),
+            "instagram": ("icon_instagram", os.path.join(APP_DIR, "instagram.webp")),
+        }
+        for kind, (tag, path) in social_assets.items():
             try:
-                icon_img = _make_social_icon(kind, size=32)
+                if not os.path.exists(path):
+                    print(f"[WARN] Social icon not found: {path}")
+                    continue
+                icon_img = Image.open(path).convert("RGBA").resize((32, 32), Image.Resampling.LANCZOS)
                 data = _image_to_dpg_texture(icon_img)
                 with dpg.texture_registry(show=False):
                     dpg.add_static_texture(width=32, height=32, default_value=data, tag=tag)
