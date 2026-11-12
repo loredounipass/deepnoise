@@ -13,6 +13,8 @@ datas = [
     (os.path.join(project_root, "assets", "fonts"), os.path.join("assets", "fonts")),
     (os.path.join(project_root, "deepnoise-icon.png"), "."),
     (os.path.join(project_root, "deepnoise.ico"), "."),
+    (os.path.join(project_root, "tiktok.avif"), "."),
+    (os.path.join(project_root, "instagram.webp"), "."),
     (os.path.join(project_root, "CHANGELOG.md"), "."),
     (os.path.join(project_root, "config.json"), "."),
 ]
