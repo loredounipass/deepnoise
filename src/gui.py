@@ -2089,7 +2089,7 @@ class DeepNoiseGUI:
 
                 dpg.add_text("Follow Me", color=[85, 102, 125], tag="footer_follow_text")
 
-                dpg.add_spacer(width=8)
+                dpg.add_spacer(width=4)
 
                 if "tiktok" in self.social_textures:
                     dpg.add_image_button(
@@ -2111,7 +2111,7 @@ class DeepNoiseGUI:
                         height=self.s(32),
                     )
 
-                dpg.add_spacer(width=8)
+                dpg.add_spacer(width=4)
 
                 if "instagram" in self.social_textures:
                     dpg.add_image_button(
