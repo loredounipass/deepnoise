@@ -2109,6 +2109,16 @@ class DeepNoiseGUI:
 
                 dpg.add_spacer(width=6)
 
+                dpg.add_button(
+                    label="Follow Me",
+                    callback=lambda: webbrowser.open("https://github.com/loredounipass/deepnoise"),
+                    tag="footer_follow_btn",
+                    width=self.s(70),
+                    height=self.s(32),
+                )
+
+
+
                 if "instagram" in self.social_textures:
                     dpg.add_image_button(
                         "icon_instagram",
