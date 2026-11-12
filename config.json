@@ -19,7 +19,7 @@
     "auto_level": false,
     "music_mode": false,
     "is_swapped": false,
-    "original_mic_id": "{0.0.1.00000000}.{b16404f0-8b77-4d93-80af-2a60c0306fdb}",
+    "original_mic_id": null,
     "auto_route": true,
     "vad_customized": true
 }

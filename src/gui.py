@@ -60,8 +60,14 @@ GWLP_WNDPROC = -4
 GWL_STYLE = -16
 WM_CLOSE = 0x0010
 WM_SYSCOMMAND = 0x0112
+WM_NCHITTEST = 0x0084
+WM_WINDOWPOSCHANGING = 0x0046
+WM_MOVING = 0x0216
+SC_MOVE = 0xF010
 SC_MINIMIZE = 0xF020
 SC_MAXIMIZE = 0xF030
+HTCLIENT = 1
+HTCAPTION = 2
 SW_HIDE = 0
 SW_RESTORE = 9
 WS_MAXIMIZEBOX = 0x00010000
@@ -70,6 +76,18 @@ SWP_FRAMECHANGED = 0x0020
 SWP_NOMOVE = 0x0002
 SWP_NOSIZE = 0x0001
 SWP_NOZORDER = 0x0004
+
+
+class WINDOWPOS(ctypes.Structure):
+    _fields_ = [
+        ("hwnd", wintypes.HWND),
+        ("hwndInsertAfter", wintypes.HWND),
+        ("x", ctypes.c_int),
+        ("y", ctypes.c_int),
+        ("cx", ctypes.c_int),
+        ("cy", ctypes.c_int),
+        ("flags", wintypes.UINT),
+    ]
 
 user32.SetWindowLongPtrW.argtypes = [wintypes.HWND, ctypes.c_int, ctypes.c_void_p]
 user32.SetWindowLongPtrW.restype = ctypes.c_void_p
@@ -266,6 +284,11 @@ class DeepNoiseGUI:
         self._hwnd: Optional[int] = None
         self._old_wndproc = None
         self._wndproc_cb = None
+        self._fixed_x: Optional[int] = None
+        self._fixed_y: Optional[int] = None
+        self._fixed_w: Optional[int] = None
+        self._fixed_h: Optional[int] = None
+        self._lock_window_pos: bool = False
         self._tray_icon: Optional[pystray.Icon] = None
         self._device_change_timer: Optional[threading.Timer] = None
         self._device_change_lock = threading.Lock()
@@ -1202,6 +1225,12 @@ class DeepNoiseGUI:
     def restore_window(self):
         """Restores window from notification area / system tray and forces foreground focus."""
         if self._hwnd:
+            if getattr(self, "_lock_window_pos", False) and self._fixed_x is not None:
+                user32.SetWindowPos(
+                    self._hwnd, 0,
+                    self._fixed_x, self._fixed_y, 0, 0,
+                    SWP_NOSIZE | SWP_NOZORDER
+                )
             force_foreground_window(self._hwnd)
 
     def _update_tray_icon(self):
@@ -1361,8 +1390,24 @@ class DeepNoiseGUI:
             style &= ~WS_THICKFRAME
             user32.SetWindowLongW(self._hwnd, GWL_STYLE, style)
             user32.SetWindowPos(self._hwnd, 0, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER)
+
+            # Remove Move and Maximize from System Menu
+            hmenu = user32.GetSystemMenu(self._hwnd, False)
+            if hmenu:
+                user32.RemoveMenu(hmenu, SC_MOVE, 0)
+                user32.RemoveMenu(hmenu, SC_MAXIMIZE, 0)
         except Exception as e:
-            print(f"[WARN] Failed to disable maximize box: {e}")
+            print(f"[WARN] Failed to configure window style: {e}")
+
+        # Ensure fixed position coordinates are captured
+        if not getattr(self, "_lock_window_pos", False) or self._fixed_x is None:
+            rect = wintypes.RECT()
+            user32.GetWindowRect(self._hwnd, ctypes.byref(rect))
+            self._fixed_x = rect.left
+            self._fixed_y = rect.top
+            self._fixed_w = rect.right - rect.left
+            self._fixed_h = rect.bottom - rect.top
+            self._lock_window_pos = True
 
         WM_DEVICECHANGE = 0x0219
         WM_DEEPNOISE_RESTORE = user32.RegisterWindowMessageW("DEEPNOISE_RESTORE_WINDOW_MSG")
@@ -1377,6 +1422,29 @@ class DeepNoiseGUI:
                 elif cmd == SC_MAXIMIZE:
                     # Maximize -> Block completely (fixed compact widget)
                     return 0
+                elif cmd == SC_MOVE:
+                    # Move -> Block completely (window position is locked)
+                    return 0
+            elif msg == WM_NCHITTEST:
+                # Intercept title bar hit test so dragging cannot move the window,
+                # while preserving clicks to focus and minimize/close buttons
+                hit = user32.CallWindowProcW(self._old_wndproc, hwnd, msg, wparam, lparam)
+                if hit == HTCAPTION:
+                    return HTCLIENT
+                return hit
+            elif msg == WM_MOVING and getattr(self, "_lock_window_pos", False) and self._fixed_x is not None:
+                rect_ptr = ctypes.cast(lparam, ctypes.POINTER(wintypes.RECT))
+                rect_ptr.contents.left = self._fixed_x
+                rect_ptr.contents.top = self._fixed_y
+                rect_ptr.contents.right = self._fixed_x + self._fixed_w
+                rect_ptr.contents.bottom = self._fixed_y + self._fixed_h
+                return 1
+            elif msg == WM_WINDOWPOSCHANGING and getattr(self, "_lock_window_pos", False) and self._fixed_x is not None:
+                pos_ptr = ctypes.cast(lparam, ctypes.POINTER(WINDOWPOS))
+                pos_ptr.contents.flags |= SWP_NOMOVE
+                pos_ptr.contents.x = self._fixed_x
+                pos_ptr.contents.y = self._fixed_y
+                return user32.CallWindowProcW(self._old_wndproc, hwnd, msg, wparam, lparam)
             elif msg == WM_CLOSE:
                 # Close button [X] -> Hide to system tray
                 user32.ShowWindow(hwnd, SW_HIDE)
@@ -1997,7 +2065,7 @@ class DeepNoiseGUI:
             dpg.bind_item_theme("modal_how_to_use", theme_modal)
             dpg.bind_item_theme("btn_how_to_use_ok", self.theme_voice_btn)
 
-        # Viewport configuration - center on active monitor work area (taskbar-aware) from frame 0
+        # Viewport configuration - positioned bottom-right on active monitor work area (taskbar-aware) from frame 0
         vp_w = self.s(520)
         vp_h = self.s(652)
         try:
@@ -2014,18 +2082,16 @@ class DeepNoiseGUI:
             hmon = user32.MonitorFromPoint(cursor_pos, MONITOR_DEFAULTTONEAREST)
             mi = MONITORINFO()
             mi.cbSize = ctypes.sizeof(MONITORINFO)
+            margin_x = self.s(16)
+            margin_y = self.s(12)
             if hmon and user32.GetMonitorInfoW(hmon, ctypes.byref(mi)):
-                work_w = mi.rcWork.right - mi.rcWork.left
-                work_h = mi.rcWork.bottom - mi.rcWork.top
-                x_pos = mi.rcWork.left + max(0, (work_w - vp_w) // 2)
-                y_pos = mi.rcWork.top + max(0, (work_h - vp_h) // 2)
+                x_pos = max(mi.rcWork.left, mi.rcWork.right - vp_w - margin_x)
+                y_pos = max(mi.rcWork.top, mi.rcWork.bottom - vp_h - margin_y)
             else:
                 work_rect = wintypes.RECT()
                 user32.SystemParametersInfoW(0x0030, 0, ctypes.byref(work_rect), 0)
-                work_w = work_rect.right - work_rect.left
-                work_h = work_rect.bottom - work_rect.top
-                x_pos = work_rect.left + max(0, (work_w - vp_w) // 2)
-                y_pos = work_rect.top + max(0, (work_h - vp_h) // 2)
+                x_pos = max(work_rect.left, work_rect.right - vp_w - margin_x)
+                y_pos = max(work_rect.top, work_rect.bottom - vp_h - margin_y)
         except Exception:
             try:
                 screen_w = user32.GetSystemMetrics(0) or 1920
@@ -2033,8 +2099,10 @@ class DeepNoiseGUI:
             except Exception:
                 screen_w = 1920
                 screen_h = 1080
-            x_pos = max(0, (screen_w - vp_w) // 2)
-            y_pos = max(0, (screen_h - vp_h) // 2)
+            margin_x = self.s(16)
+            margin_y = self.s(12)
+            x_pos = max(0, screen_w - vp_w - margin_x)
+            y_pos = max(0, screen_h - vp_h - margin_y)
 
         dpg.create_viewport(
             title="DeepNoise - AI Noise Cancellation",
@@ -2065,7 +2133,7 @@ class DeepNoiseGUI:
         except Exception:
             pass
 
-        # Synchronous dead-center window placement on active monitor work area (taskbar-aware)
+        # Synchronous bottom-right window placement on active monitor work area (taskbar-aware)
         try:
             hwnd = user32.FindWindowW(None, "DeepNoise - AI Noise Cancellation")
             if hwnd:
@@ -2079,13 +2147,18 @@ class DeepNoiseGUI:
                 mi = MONITORINFO()
                 mi.cbSize = ctypes.sizeof(MONITORINFO)
                 if hmon and user32.GetMonitorInfoW(hmon, ctypes.byref(mi)):
-                    work_w = mi.rcWork.right - mi.rcWork.left
-                    work_h = mi.rcWork.bottom - mi.rcWork.top
-                    cx = mi.rcWork.left + max(0, (work_w - win_w) // 2)
-                    cy = mi.rcWork.top + max(0, (work_h - win_h) // 2)
-                    user32.SetWindowPos(hwnd, 0, cx, cy, 0, 0, SWP_NOSIZE | SWP_NOZORDER)
+                    margin_x = self.s(16)
+                    margin_y = self.s(12)
+                    target_x = max(mi.rcWork.left, mi.rcWork.right - win_w - margin_x)
+                    target_y = max(mi.rcWork.top, mi.rcWork.bottom - win_h - margin_y)
+                    user32.SetWindowPos(hwnd, 0, target_x, target_y, 0, 0, SWP_NOSIZE | SWP_NOZORDER)
+                    self._fixed_x = target_x
+                    self._fixed_y = target_y
+                    self._fixed_w = win_w
+                    self._fixed_h = win_h
+                    self._lock_window_pos = True
         except Exception as e:
-            print(f"[WARN] Failed to center window: {e}")
+            print(f"[WARN] Failed to position window: {e}")
 
         self._update_cable_banner()
         self._update_selection_hint()
