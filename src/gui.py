@@ -268,6 +268,50 @@ def create_tray_icon_image(is_active: bool = False) -> Image.Image:
     return canvas
 
 
+def _make_social_icon(kind: str, size: int = 32) -> Image.Image:
+    """Generate a social media icon image with PIL (no external assets required)."""
+    img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+
+    if kind == "tiktok":
+        cx, cy = size // 2, size // 2
+        r = size // 2 - 2
+        draw.ellipse((2, 2, size - 2, size - 2), fill=(0, 0, 0, 255))
+        # stylized music note in white
+        draw.ellipse((cx - 5, cy - 7, cx, cy + 1), fill=(255, 255, 255, 255))
+        draw.rectangle((cx + 1, cy - 1, cx + 5, cy + 5), fill=(255, 255, 255, 255))
+        draw.ellipse((cx - 2, cy + 5, cx + 2, cy + 11), fill=(255, 255, 255, 255))
+    elif kind == "instagram":
+        # gradient-ish rounded square background (pink -> orange)
+        for i in range(size):
+            for j in range(size):
+                t = (i + j) / (2 * size)
+                r = int(225 * (1 - t) + 255 * t)
+                g = int(48 * (1 - t) + 145 * t)
+                b = int(108 * (1 - t) + 50 * t)
+                draw.point((i, j), fill=(r, g, b, 255))
+        draw.rounded_rectangle((2, 2, size - 2, size - 2), radius=max(2, size // 5), fill=(255, 255, 255, 0))
+        # camera body
+        pad = size * 0.22
+        draw.rounded_rectangle((pad, pad, size - pad, size - pad), radius=max(1, size // 10), fill=(255, 255, 255, 255))
+        # lens circle
+        lens = size * 0.32
+        draw.ellipse((size / 2 - lens / 2, size / 2 - lens / 2, size / 2 + lens / 2, size / 2 + lens / 2), fill=(255, 255, 255, 0), outline=(225, 48, 108, 255), width=max(1, size // 12))
+        # flash dot
+        dot = size * 0.09
+        draw.ellipse((size - size * 0.28 - dot / 2, size * 0.28 - dot / 2, size - size * 0.28 + dot / 2, size * 0.28 + dot / 2), fill=(255, 255, 255, 255))
+
+    return img
+
+
+def _image_to_dpg_texture(img: Image.Image) -> list:
+    """Convert a PIL RGBA image to a Dear PyGui static texture data list (floats 0-1)."""
+    img = img.convert("RGBA")
+    raw = img.tobytes()
+    data = [b / 255.0 for b in raw]
+    return data
+
+
 class DeepNoiseGUI:
     def __init__(self):
         # Explicit AppUserModelID ensures Windows Taskbar pins the custom icon instead of python.exe
@@ -1616,6 +1660,18 @@ class DeepNoiseGUI:
             except Exception as e:
                 print(f"[WARN] Failed to load icon texture: {e}")
 
+        # --- SOCIAL ICON TEXTURES (generated with PIL) ---
+        self.social_textures = {}
+        for kind, tag in (("tiktok", "icon_tiktok"), ("instagram", "icon_instagram")):
+            try:
+                icon_img = _make_social_icon(kind, size=32)
+                data = _image_to_dpg_texture(icon_img)
+                with dpg.texture_registry(show=False):
+                    dpg.add_static_texture(width=32, height=32, default_value=data, tag=tag)
+                self.social_textures[kind] = tag
+            except Exception as e:
+                print(f"[WARN] Failed to load {kind} icon texture: {e}")
+
         # --- FONT CONFIGURATION: BUNDLED INTER (WITH SYSTEM FALLBACK) ---
         bundled_font_dir = os.path.join(APP_DIR, "assets", "fonts")
         system_font_dir = os.path.join(os.environ.get("SystemRoot", r"C:\Windows"), "Fonts")
@@ -1781,6 +1837,14 @@ class DeepNoiseGUI:
                 dpg.add_theme_color(dpg.mvThemeCol_ButtonActive, (0, 105, 225))
                 dpg.add_theme_color(dpg.mvThemeCol_Text, (255, 255, 255))
                 dpg.add_theme_style(dpg.mvStyleVar_FrameRounding, self.s(7))
+
+        # Icon button theme (transparent background with subtle hover for social icons)
+        with dpg.theme() as self.theme_icon_btn:
+            with dpg.theme_component(dpg.mvButton):
+                dpg.add_theme_color(dpg.mvThemeCol_Button, (0, 0, 0, 0))
+                dpg.add_theme_color(dpg.mvThemeCol_ButtonHovered, (255, 255, 255, 30))
+                dpg.add_theme_color(dpg.mvThemeCol_ButtonActive, (255, 255, 255, 60))
+                dpg.add_theme_style(dpg.mvStyleVar_FrameRounding, self.s(6))
 
         # Voice test button theme (Frosted surface - Unavailable while active)
         with dpg.theme() as self.theme_voice_btn_disabled:
@@ -2051,21 +2115,46 @@ class DeepNoiseGUI:
             with dpg.group(horizontal=True, tag="footer_sponsor_row"):
                 dpg.add_text("Created by loredounipass", color=[85, 102, 125], tag="footer_creator_text")
                 dpg.add_spacer(width=16)
-                dpg.add_button(
-                    label="🎵 TikTok click here",
-                    callback=lambda: webbrowser.open("https://www.tiktok.com/@erickcedeno00"),
-                    tag="footer_tiktok_btn",
-                    width=-1,
-                    height=self.s(24),
-                )
+
+                if "tiktok" in self.social_textures:
+                    dpg.add_image_button(
+                        "icon_tiktok",
+                        callback=lambda: webbrowser.open("https://www.tiktok.com/@erickcedeno00"),
+                        tag="footer_tiktok_btn",
+                        width=32,
+                        height=32,
+                    )
+                    dpg.bind_item_theme("footer_tiktok_btn", self.theme_icon_btn)
+                    dpg.set_item_tooltip("footer_tiktok_btn", "TikTok — click here")
+                else:
+                    dpg.add_button(
+                        label="TikTok click here",
+                        callback=lambda: webbrowser.open("https://www.tiktok.com/@erickcedeno00"),
+                        tag="footer_tiktok_btn",
+                        width=self.s(70),
+                        height=self.s(32),
+                    )
+
                 dpg.add_spacer(width=10)
-                dpg.add_button(
-                    label="📷 Instagram click here",
-                    callback=lambda: webbrowser.open("https://www.instagram.com/crypto_society00/?hl=en"),
-                    tag="footer_instagram_btn",
-                    width=-1,
-                    height=self.s(24),
-                )
+
+                if "instagram" in self.social_textures:
+                    dpg.add_image_button(
+                        "icon_instagram",
+                        callback=lambda: webbrowser.open("https://www.instagram.com/crypto_society00/?hl=en"),
+                        tag="footer_instagram_btn",
+                        width=32,
+                        height=32,
+                    )
+                    dpg.bind_item_theme("footer_instagram_btn", self.theme_icon_btn)
+                    dpg.set_item_tooltip("footer_instagram_btn", "Instagram — click here")
+                else:
+                    dpg.add_button(
+                        label="Instagram click here",
+                        callback=lambda: webbrowser.open("https://www.instagram.com/crypto_society00/?hl=en"),
+                        tag="footer_instagram_btn",
+                        width=self.s(85),
+                        height=self.s(32),
+                    )
 
             # Bind specialized fonts to elements
             if self.font_header:
