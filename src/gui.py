@@ -2050,6 +2050,22 @@ class DeepNoiseGUI:
             # --- FOOTER: CREATOR ---
             with dpg.group(horizontal=True, tag="footer_sponsor_row"):
                 dpg.add_text("Created by loredounipass", color=[85, 102, 125], tag="footer_creator_text")
+                dpg.add_spacer(width=16)
+                dpg.add_button(
+                    label="🎵 TikTok click here",
+                    callback=lambda: webbrowser.open("https://www.tiktok.com/@erickcedeno00"),
+                    tag="footer_tiktok_btn",
+                    width=-1,
+                    height=self.s(24),
+                )
+                dpg.add_spacer(width=10)
+                dpg.add_button(
+                    label="📷 Instagram click here",
+                    callback=lambda: webbrowser.open("https://www.instagram.com/crypto_society00/?hl=en"),
+                    tag="footer_instagram_btn",
+                    width=-1,
+                    height=self.s(24),
+                )
 
             # Bind specialized fonts to elements
             if self.font_header:
