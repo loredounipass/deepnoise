@@ -98,3 +98,4 @@ def sync_autostart_with_config(config: dict) -> bool:
     if desired != current:
         return set_autostart(desired)
     return True
+
