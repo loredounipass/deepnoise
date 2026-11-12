@@ -16,13 +16,13 @@ class TestConfig(unittest.TestCase):
         self.assertTrue(os.path.isabs(path))
 
     @patch("sys.frozen", True, create=True)
-    @patch("sys.executable", "C:\\Program Files\\Getsu\\getsu.exe")
+    @patch("sys.executable", "C:\\Program Files\\DeepNoise\\deepnoise.exe")
     def test_frozen_installed_mode_config_path(self):
-        # When sys.executable is in a non-writable folder, it should resolve to APPDATA\Getsu\config.json
+        # When sys.executable is in a non-writable folder, it should resolve to APPDATA\DeepNoise\config.json
         with patch("os.environ", {"APPDATA": tempfile.gettempdir()}):
             path = get_config_path()
             self.assertTrue(path.endswith("config.json"))
-            self.assertIn("Getsu", path)
+            self.assertIn("DeepNoise", path)
             self.assertTrue(path.startswith(tempfile.gettempdir()))
 
     def test_save_and_load_config(self):

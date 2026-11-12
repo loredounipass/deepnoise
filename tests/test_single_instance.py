@@ -9,7 +9,7 @@ class TestSingleInstance(unittest.TestCase):
 
         import src.single_instance as si
         kernel32 = ctypes.windll.kernel32
-        test_mutex_name = "Local\\Getsu_SingleInstance_Test_Mutex_XYZ"
+        test_mutex_name = "Local\\DeepNoise_SingleInstance_Test_Mutex_XYZ"
 
         # 1. Initial call should acquire mutex and return False (not already running)
         is_already_running_1 = si.activate_existing_instance(mutex_name=test_mutex_name)

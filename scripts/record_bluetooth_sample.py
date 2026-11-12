@@ -108,7 +108,7 @@ def draw_vu_meter(db: float, width: int = 24) -> str:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Getsu Bluetooth Voice Recorder & Acoustic Sampler")
+    parser = argparse.ArgumentParser(description="DeepNoise Bluetooth Voice Recorder & Acoustic Sampler")
     parser.add_argument("--duration", type=float, default=15.0, help="Recording duration in seconds (default: 15.0)")
     parser.add_argument("--auto", action="store_true", help="Auto-start recording without waiting for interactive confirmation")
     parser.add_argument("--no-playback", action="store_true", help="Skip interactive playback prompt at the end")
@@ -118,7 +118,7 @@ def main():
     record_duration = args.duration
 
     print("=" * 68)
-    print(f"  Getsu Bluetooth Voice Recorder & Acoustic Sampler ({record_duration:.0f}s)")
+    print(f"  DeepNoise Bluetooth Voice Recorder & Acoustic Sampler ({record_duration:.0f}s)")
     print("=" * 68)
 
     # 1. Device Resolution
@@ -268,7 +268,7 @@ def main():
         print(f"[!] Playback notice: {e}")
 
     print("\nReady for analysis! You can clean this sample with:")
-    print(f"  getsu-cli --clean \"{output_path}\"")
+    print(f"  deepnoise-cli --clean \"{output_path}\"")
     print("=" * 68)
 
 

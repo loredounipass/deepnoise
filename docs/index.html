@@ -3,32 +3,29 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Getsu — Free Microphone Noise Cancellation for Windows</title>
+  <title>DeepNoise — Free Microphone Noise Cancellation for Windows</title>
   
   <!-- Primary Meta Tags -->
-  <meta name="title" content="Getsu — Real-Time AI Noise Cancellation for Windows">
+  <meta name="title" content="DeepNoise — Real-Time AI Noise Cancellation for Windows">
   <meta name="description" content="Real-time AI noise cancellation for Windows. Filters out fan roar, mechanical keyboards, room noise, and distant chatter directly on your CPU — free, offline, and lightweight.">
   <meta name="keywords" content="noise cancellation, krisp alternative, rtx voice alternative, mic noise filter, discord mic, steam voice chat, rnnoise, windows audio, open source">
-  <meta name="author" content="Ihsan (@skttr87)">
+  <meta name="author" content="loredounipass">
   <meta name="robots" content="index, follow">
   <meta name="google-site-verification" content="pLcNw7pDa76nbjX73Zeg4DDW56kYsz_2nwHZyaGM25I">
-  <link rel="canonical" href="https://skttr87.github.io/getsu/">
+  <link rel="canonical" href="https://loredounipass.github.io/deepnoise/">
   <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
-  <link rel="sitemap" type="application/xml" title="Sitemap" href="https://skttr87.github.io/getsu/sitemap.xml">
+  <link rel="sitemap" type="application/xml" title="Sitemap" href="https://loredounipass.github.io/deepnoise/sitemap.xml">
 
   <!-- Open Graph / Discord -->
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://skttr87.github.io/getsu/">
-  <meta property="og:title" content="Getsu — Real-Time AI Noise Cancellation for Windows">
+  <meta property="og:url" content="https://loredounipass.github.io/deepnoise/">
+  <meta property="og:title" content="DeepNoise — Real-Time AI Noise Cancellation for Windows">
   <meta property="og:description" content="Real-time AI noise cancellation for Windows. Filters out fan roar, mechanical keyboards, room noise, and distant chatter directly on your CPU — free, offline, and lightweight.">
-  <meta property="og:image" content="https://raw.githubusercontent.com/skttr87/getsu/main/assets/getsu-ui.png">
+  <meta property="og:image" content="https://raw.githubusercontent.com/skttr87/deepnoise/main/assets/deepnoise-ui.png">
 
-  <!-- Twitter -->
-  <meta property="twitter:card" content="summary_large_image">
-  <meta property="twitter:url" content="https://skttr87.github.io/getsu/">
-  <meta property="twitter:title" content="Getsu — Real-Time AI Noise Cancellation for Windows">
-  <meta property="twitter:description" content="Real-time AI noise cancellation for Windows. Filters out fan roar, mechanical keyboards, room noise, and distant chatter directly on your CPU — free, offline, and lightweight.">
-  <meta property="twitter:image" content="https://raw.githubusercontent.com/skttr87/getsu/main/assets/getsu-ui.png">
+  <!-- TikTok / Social -->
+  <meta property="og:see_also" content="https://www.tiktok.com/@erickcedeno00">
+  <link rel="me" href="https://www.tiktok.com/@erickcedeno00">
 
   <!-- Google Structured Data (JSON-LD) -->
   <script type="application/ld+json">
@@ -37,7 +34,7 @@
     "@graph": [
       {
         "@type": "SoftwareApplication",
-        "name": "Getsu",
+        "name": "DeepNoise",
         "operatingSystem": "Windows 10, Windows 11",
         "applicationCategory": "AudioApplication",
         "softwareVersion": "1.3.1",
@@ -47,11 +44,11 @@
           "priceCurrency": "USD"
         },
         "license": "https://opensource.org/licenses/MIT",
-        "downloadUrl": "https://github.com/skttr87/getsu/releases/download/v1.3.1/Getsu-v1.3.1-Setup.exe",
+        "downloadUrl": "https://github.com/loredounipass/deepnoise/releases/download/v1.3.1/DeepNoise-v1.3.1-Setup.exe",
         "author": {
           "@type": "Person",
-          "name": "Ihsan",
-          "url": "https://github.com/skttr87"
+          "name": "loredounipass",
+          "url": "https://github.com/loredounipass"
         },
         "description": "Free, open-source real-time microphone noise cancellation for Windows. Cleans your voice using Mozilla RNNoise and routes clean audio to Discord, Steam, Zoom, and games."
       },
@@ -63,7 +60,7 @@
             "name": "How is this different from Discord's Krisp?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "Krisp in Discord only cleans your voice inside Discord. Getsu cleans the mic for every app that uses it, including Steam, Zoom, OBS, and games."
+              "text": "Krisp in Discord only cleans your voice inside Discord. DeepNoise cleans the mic for every app that uses it, including Steam, Zoom, OBS, and games."
             }
           },
           {
@@ -87,7 +84,7 @@
             "name": "Does it remove mechanical keyboard sounds and mouse clicks?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "Yes. While standalone neural networks can struggle with sharp keystrokes, Getsu pairs RNNoise with an 80Hz rumble filter and an adaptive S-curve noise gate with 10ms lookahead pre-roll. Keystrokes, mouse clicks, and desk thumps are silenced without clipping your voice."
+              "text": "Yes. While standalone neural networks can struggle with sharp keystrokes, DeepNoise pairs RNNoise with an 80Hz rumble filter and an adaptive S-curve noise gate with 10ms lookahead pre-roll. Keystrokes, mouse clicks, and desk thumps are silenced without clipping your voice."
             }
           },
           {
@@ -95,7 +92,7 @@
             "name": "Is it private?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "Everything runs on your computer. Getsu doesn't record to disk, make network connections for audio, or ask for an account. The code is on GitHub if you want to check."
+              "text": "Everything runs on your computer. DeepNoise doesn't record to disk, make network connections for audio, or ask for an account. The code is on GitHub if you want to check."
             }
           }
         ]
@@ -653,8 +650,8 @@
   <header>
     <div class="container nav">
       <a href="#" class="brand">
-        <img src="assets/favicon.ico" alt="Getsu Icon">
-        Getsu
+        <img src="assets/favicon.ico" alt="DeepNoise Icon">
+        DeepNoise
       </a>
       <div class="nav-links">
         <a href="#blocks">What It Blocks</a>
@@ -662,7 +659,7 @@
         <a href="#cli">CLI Cleaner</a>
         <a href="#limits">Limits</a>
         <a href="#faq">FAQ</a>
-        <a href="https://github.com/skttr87/getsu" target="_blank">GitHub</a>
+        <a href="https://github.com/loredounipass/deepnoise" target="_blank">GitHub</a>
       </div>
     </div>
   </header>
@@ -680,11 +677,11 @@
           </p>
 
           <div class="cta-area">
-            <a href="https://github.com/skttr87/getsu/releases/download/v1.3.1/Getsu-v1.3.1-Setup.exe" class="btn-download" id="download-link">
+            <a href="https://github.com/loredounipass/deepnoise/releases/download/v1.3.1/DeepNoise-v1.3.1-Setup.exe" class="btn-download" id="download-link">
               <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-              <span id="download-text">Download Getsu v1.3.1 (Setup.exe)</span>
+              <span id="download-text">Download DeepNoise v1.3.1 (Setup.exe)</span>
             </a>
-            <a href="https://github.com/skttr87/getsu" target="_blank" class="btn-github">
+            <a href="https://github.com/loredounipass/deepnoise" target="_blank" class="btn-github">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
               View Source
             </a>
@@ -694,13 +691,13 @@
           </div>
 
           <div class="origin-note">
-            <strong>Getsu</strong> comes from two Acehnese words: <strong>gèt</strong> (<em>"good"</em>) and <strong>su</strong> (<em>"sound"</em>).
+            <strong>DeepNoise</strong> comes from two Acehnese words: <strong>gèt</strong> (<em>"good"</em>) and <strong>su</strong> (<em>"sound"</em>).
           </div>
         </div>
 
         <div class="hero-image">
           <div class="screenshot-box">
-            <img src="assets/getsu-ui.png" alt="Getsu Windows Application Screenshot">
+            <img src="assets/deepnoise-ui.png" alt="DeepNoise Windows Application Screenshot">
           </div>
         </div>
       </div>
@@ -711,17 +708,17 @@
       <h2>Why I built this</h2>
       <div class="story-card">
         <p>
-          "I built Getsu because I play Dota 2 with friends who are too broke for RTX graphics cards, studio mics, or Krisp subscriptions. Our calls were full of fan roar, mechanical keyboard clatter, and the occasional family drama in the background. I wanted a simple tool that runs locally on any normal CPU, costs nothing, has zero tracking, and gets out of the way."
+          "I built DeepNoise because I play Dota 2 with friends who are too broke for RTX graphics cards, studio mics, or Krisp subscriptions. Our calls were full of fan roar, mechanical keyboard clatter, and the occasional family drama in the background. I wanted a simple tool that runs locally on any normal CPU, costs nothing, has zero tracking, and gets out of the way."
         </p>
-        <div class="story-author">— Ihsan, developer of Getsu</div>
+        <div class="story-author">— loredounipass, developer of DeepNoise</div>
       </div>
     </section>
 
-    <!-- What Getsu Blocks -->
+    <!-- What DeepNoise Blocks -->
     <section id="blocks">
-      <h2>What Getsu blocks</h2>
+      <h2>What DeepNoise blocks</h2>
       <p style="color: var(--muted);">
-        Getsu cleans your mic audio in real time, cutting out common background noise from gaming setups and shared rooms:
+        DeepNoise cleans your mic audio in real time, cutting out common background noise from gaming setups and shared rooms:
       </p>
 
       <div class="noise-grid">
@@ -775,7 +772,7 @@
     <section id="how-it-works">
       <h2>How it works</h2>
       <p>
-        Getsu captures your microphone audio, passes it through an <strong>80Hz low-cut filter</strong>, isolates human speech with <strong>RNNoise</strong> (an open-source recurrent neural network from Mozilla), suppresses transient clicks with an <strong>adaptive S-curve gate</strong>, and sends the pristine voice to a virtual microphone called <strong>CABLE Output</strong>.
+        DeepNoise captures your microphone audio, passes it through an <strong>80Hz low-cut filter</strong>, isolates human speech with <strong>RNNoise</strong> (an open-source recurrent neural network from Mozilla), suppresses transient clicks with an <strong>adaptive S-curve gate</strong>, and sends the pristine voice to a virtual microphone called <strong>CABLE Output</strong>.
       </p>
 
       <div class="diagram-box">
@@ -783,12 +780,12 @@
       </div>
 
       <p>
-        When you press <strong>START</strong>, Getsu automatically sets the virtual mic as your Windows default recording device.
+        When you press <strong>START</strong>, DeepNoise automatically sets the virtual mic as your Windows default recording device.
       </p>
 
       <h3 style="font-size: 1.15rem; margin-top: 24px; margin-bottom: 8px;">Configuring your games and voice apps</h3>
       <p style="color: var(--muted); font-size: 0.95rem;">
-        Getsu automatically routes clean audio to any app set to your <strong>Default</strong> microphone. If an app was previously hard-locked to your raw physical mic, set it to <code>Default</code> or <code>CABLE Output</code>:
+        DeepNoise automatically routes clean audio to any app set to your <strong>Default</strong> microphone. If an app was previously hard-locked to your raw physical mic, set it to <code>Default</code> or <code>CABLE Output</code>:
       </p>
 
       <div class="setup-grid">
@@ -800,7 +797,7 @@
             <li>Turn <strong>OFF</strong> Steam's built-in <em>Noise Cancellation</em>.</li>
           </ol>
           <div class="setup-tip">
-            💡 Steam's built-in noise cancellation can double-process audio and cause robotic distortion. Turn it off and let Getsu handle it cleanly.
+            💡 Steam's built-in noise cancellation can double-process audio and cause robotic distortion. Turn it off and let DeepNoise handle it cleanly.
           </div>
         </div>
 
@@ -812,7 +809,7 @@
             <li>Turn <strong>OFF</strong> Discord's <em>Krisp</em> noise suppression.</li>
           </ol>
           <div class="setup-tip">
-            💡 Disabling Krisp in Discord prevents double-filtering and lowers Discord's CPU usage while Getsu provides pristine voice isolation.
+            💡 Disabling Krisp in Discord prevents double-filtering and lowers Discord's CPU usage while DeepNoise provides pristine voice isolation.
           </div>
         </div>
 
@@ -830,7 +827,7 @@
       </div>
 
       <p>
-        When you press <strong>STOP</strong> or exit Getsu from the notification tray, your original microphone is restored right away.
+        When you press <strong>STOP</strong> or exit DeepNoise from the notification tray, your original microphone is restored right away.
       </p>
       <p style="color: var(--muted); font-size: 0.95rem;">
         <em>Note: The installer bundles the standard VB-Audio Virtual Cable driver. You can untick it during setup if you already have it installed.</em>
@@ -838,9 +835,9 @@
 
     <!-- Headless CLI Batch Cleaner -->
     <section id="cli">
-      <h2>Headless Audio Batch Cleaner (getsu-cli)</h2>
+      <h2>Headless Audio Batch Cleaner (deepnoise-cli)</h2>
       <p>
-        Getsu includes <code>getsu-cli.exe</code> (available in v1.3.0+), a high-performance console companion tool designed for terminal power users, batch audio post-production, and automated CI pipelines. It executes completely decoupled from the desktop app, allowing you to clean recorded files while Getsu filters your live microphone in the background.
+        DeepNoise includes <code>deepnoise-cli.exe</code> (available in v1.3.0+), a high-performance console companion tool designed for terminal power users, batch audio post-production, and automated CI pipelines. It executes completely decoupled from the desktop app, allowing you to clean recorded files while DeepNoise filters your live microphone in the background.
       </p>
 
       <div class="setup-grid" style="margin-top: 18px;">
@@ -852,8 +849,8 @@
             <div class="cli-comment"># Automatically outputs to recording_cleaned.wav</div>
             <div class="cli-command-row">
               <span class="cli-prompt">$</span>
-              <code class="cli-code">getsu-cli --clean recording.wav</code>
-              <button class="cli-copy-btn" title="Copy command" aria-label="Copy command" onclick="copyCliCmd(this, 'getsu-cli --clean recording.wav')">
+              <code class="cli-code">deepnoise-cli --clean recording.wav</code>
+              <button class="cli-copy-btn" title="Copy command" aria-label="Copy command" onclick="copyCliCmd(this, 'deepnoise-cli --clean recording.wav')">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
               </button>
             </div>
@@ -863,8 +860,8 @@
             <div class="cli-comment"># Specify custom destination path</div>
             <div class="cli-command-row">
               <span class="cli-prompt">$</span>
-              <code class="cli-code">getsu-cli --clean in.wav D:\output\clean.wav</code>
-              <button class="cli-copy-btn" title="Copy command" aria-label="Copy command" onclick="copyCliCmd(this, 'getsu-cli --clean in.wav D:\\output\\clean.wav')">
+              <code class="cli-code">deepnoise-cli --clean in.wav D:\output\clean.wav</code>
+              <button class="cli-copy-btn" title="Copy command" aria-label="Copy command" onclick="copyCliCmd(this, 'deepnoise-cli --clean in.wav D:\\output\\clean.wav')">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
               </button>
             </div>
@@ -879,8 +876,8 @@
             <div class="cli-comment"># Cleans all audio files in directory</div>
             <div class="cli-command-row">
               <span class="cli-prompt">$</span>
-              <code class="cli-code">getsu-cli --clean D:\recordings\podcast\</code>
-              <button class="cli-copy-btn" title="Copy command" aria-label="Copy command" onclick="copyCliCmd(this, 'getsu-cli --clean D:\\recordings\\podcast\\')">
+              <code class="cli-code">deepnoise-cli --clean D:\recordings\podcast\</code>
+              <button class="cli-copy-btn" title="Copy command" aria-label="Copy command" onclick="copyCliCmd(this, 'deepnoise-cli --clean D:\\recordings\\podcast\\')">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
               </button>
             </div>
@@ -895,8 +892,8 @@
             <div class="cli-comment"># Coupled linked-stereo gating</div>
             <div class="cli-command-row">
               <span class="cli-prompt">$</span>
-              <code class="cli-code">getsu-cli --clean track.wav --stereo</code>
-              <button class="cli-copy-btn" title="Copy command" aria-label="Copy command" onclick="copyCliCmd(this, 'getsu-cli --clean track.wav --stereo')">
+              <code class="cli-code">deepnoise-cli --clean track.wav --stereo</code>
+              <button class="cli-copy-btn" title="Copy command" aria-label="Copy command" onclick="copyCliCmd(this, 'deepnoise-cli --clean track.wav --stereo')">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
               </button>
             </div>
@@ -906,8 +903,8 @@
             <div class="cli-comment"># Preserves singing vibrato & instrument sustain</div>
             <div class="cli-command-row">
               <span class="cli-prompt">$</span>
-              <code class="cli-code">getsu-cli --clean vocals.wav --music-mode</code>
-              <button class="cli-copy-btn" title="Copy command" aria-label="Copy command" onclick="copyCliCmd(this, 'getsu-cli --clean vocals.wav --music-mode')">
+              <code class="cli-code">deepnoise-cli --clean vocals.wav --music-mode</code>
+              <button class="cli-copy-btn" title="Copy command" aria-label="Copy command" onclick="copyCliCmd(this, 'deepnoise-cli --clean vocals.wav --music-mode')">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
               </button>
             </div>
@@ -978,7 +975,7 @@
         <li><strong>Windows only:</strong> Runs on Windows 10 and Windows 11 (64-bit). There is no macOS or Linux build.</li>
         <li><strong>Needs a virtual audio driver:</strong> Requires VB-Cable to route audio between apps (the installer handles this automatically).</li>
         <li><strong>Resource usage:</strong> Adds roughly ~1.2ms of audio processing buffer and uses about ~1.5% CPU on a standard quad-core laptop. Zero GPU usage.</li>
-        <li><strong>Unsigned installer warning:</strong> Getsu is an open-source project and isn't digitally signed with an expensive commercial certificate ($300+/year). Windows SmartScreen or your antivirus might show an "Unknown Publisher" warning on first launch. The source code is completely public, and the installer's SHA-256 checksum is published on the <a href="https://github.com/skttr87/getsu/releases/latest" target="_blank" style="color: var(--link);">release page</a>.</li>
+        <li><strong>Unsigned installer warning:</strong> DeepNoise is an open-source project and isn't digitally signed with an expensive commercial certificate ($300+/year). Windows SmartScreen or your antivirus might show an "Unknown Publisher" warning on first launch. The source code is completely public, and the installer's SHA-256 checksum is published on the <a href="https://github.com/loredounipass/deepnoise/releases/latest" target="_blank" style="color: var(--link);">release page</a>.</li>
       </ul>
     </section>
 
@@ -988,12 +985,12 @@
       <div class="faq-group">
         <div class="faq-item">
           <h3>How is this different from Discord's Krisp?</h3>
-          <p>Krisp in Discord only cleans your voice inside Discord calls. Getsu cleans the mic for every app that uses it, including Steam voice chat, Zoom, OBS Studio, and in-game voice chat (like Counter-Strike 2 and Valorant) with no time limits.</p>
+          <p>Krisp in Discord only cleans your voice inside Discord calls. DeepNoise cleans the mic for every app that uses it, including Steam voice chat, Zoom, OBS Studio, and in-game voice chat (like Counter-Strike 2 and Valorant) with no time limits.</p>
         </div>
 
         <div class="faq-item">
           <h3>Do I need an NVIDIA GPU?</h3>
-          <p>No. Getsu runs entirely on the CPU, so it works on AMD, Intel, and budget laptops without a dedicated graphics card.</p>
+          <p>No. DeepNoise runs entirely on the CPU, so it works on AMD, Intel, and budget laptops without a dedicated graphics card.</p>
         </div>
 
         <div class="faq-item">
@@ -1003,12 +1000,12 @@
 
         <div class="faq-item">
           <h3>Does it remove mechanical keyboard sounds and mouse clicks?</h3>
-          <p>Yes. While standalone neural networks can struggle with sharp keystrokes, Getsu pairs RNNoise with an 80Hz rumble filter and an adaptive S-curve noise gate with 10ms lookahead pre-roll. Keystrokes, mouse clicks, and desk thumps are silenced without clipping your voice.</p>
+          <p>Yes. While standalone neural networks can struggle with sharp keystrokes, DeepNoise pairs RNNoise with an 80Hz rumble filter and an adaptive S-curve noise gate with 10ms lookahead pre-roll. Keystrokes, mouse clicks, and desk thumps are silenced without clipping your voice.</p>
         </div>
 
         <div class="faq-item">
           <h3>Is it private?</h3>
-          <p>Everything runs directly on your computer. Getsu does not record your audio to disk, never makes network connections for voice processing, and does not ask for an account. The full code is on GitHub if you want to inspect it.</p>
+          <p>Everything runs directly on your computer. DeepNoise does not record your audio to disk, never makes network connections for voice processing, and does not ask for an account. The full code is on GitHub if you want to inspect it.</p>
         </div>
       </div>
     </section>
@@ -1019,15 +1016,9 @@
   <footer>
     <div class="container footer-inner">
       <div>
-        Made by Ihsan. Open source (<a href="https://github.com/skttr87/getsu/blob/main/LICENSE" target="_blank">MIT</a>).
+        Created by loredounipass • <a href="https://www.tiktok.com/@erickcedeno00" target="_blank">TikTok</a>. Open source (<a href="https://github.com/loredounipass/deepnoise/blob/main/LICENSE" target="_blank">MIT</a>).
         <br>
         <span style="font-size: 0.8rem; color: #6E7681;">I built this because RTX Voice wouldn't run on my laptop.</span>
-      </div>
-      <div>
-        <a href="https://www.instagram.com/kopireman/" target="_blank" class="sponsor-link">
-          <span>Sponsored by</span>
-          <img src="assets/kopi-reman.png" alt="Kopi Reman Logo">
-        </a>
       </div>
     </div>
   </footer>
@@ -1049,7 +1040,7 @@
           var downloadLink = document.getElementById('download-link');
           var downloadText = document.getElementById('download-text');
           if (downloadLink) downloadLink.href = exeAsset.browser_download_url;
-          if (downloadText) downloadText.textContent = 'Download Getsu ' + tag + ' (Setup.exe)';
+          if (downloadText) downloadText.textContent = 'Download DeepNoise ' + tag + ' (Setup.exe)';
 
           if (exeAsset.size) {
             var mb = Math.round(exeAsset.size / (1024 * 1024));
@@ -1062,11 +1053,11 @@
       var headers = { 'Accept': 'application/vnd.github.v3+json' };
       var cacheBust = '?t=' + Date.now();
 
-      fetch('https://api.github.com/repos/skttr87/getsu/releases/latest' + cacheBust, { cache: 'no-store', headers: headers })
+      fetch('https://api.github.com/repos/loredounipass/deepnoise/releases/latest' + cacheBust, { cache: 'no-store', headers: headers })
         .then(function(res) {
           if (res.ok) return res.json();
           // Fallback to latest item in releases list if /releases/latest has CDN propagation delay
-          return fetch('https://api.github.com/repos/skttr87/getsu/releases' + cacheBust, { cache: 'no-store', headers: headers })
+          return fetch('https://api.github.com/repos/loredounipass/deepnoise/releases' + cacheBust, { cache: 'no-store', headers: headers })
             .then(function(r) { return r.ok ? r.json() : null; })
             .then(function(list) { return (list && list.length) ? list[0] : null; });
         })

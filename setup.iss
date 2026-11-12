@@ -1,12 +1,12 @@
-; Inno Setup 6/7 Script for Getsu AI Real-Time Noise Cancellation
+; Inno Setup 6/7 Script for DeepNoise AI Real-Time Noise Cancellation
 ; ==============================================================
 
-#define MyAppName "Getsu"
+#define MyAppName "DeepNoise"
 #define MyAppVersion "1.3.1"
-#define MyAppPublisher "skttr87"
+#define MyAppPublisher "loredounipass"
 
-#define MyAppURL "https://github.com/skttr87/getsu"
-#define MyAppExeName "getsu.exe"
+#define MyAppURL "https://github.com/loredounipass/deepnoise"
+#define MyAppExeName "deepnoise.exe"
 
 [Setup]
 AppId={{8B4F923D-567A-4831-9F3B-2A58C7E1B455}
@@ -16,45 +16,45 @@ AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
-AppMutex=Local\Getsu_SingleInstance_Mutex_8F9A
-SetupMutex=Getsu_Setup_Instance_Mutex
+AppMutex=Local\DeepNoise_SingleInstance_Mutex_8F9A
+SetupMutex=DeepNoise_Setup_Instance_Mutex
 ChangesEnvironment=yes
-DefaultDirName={autopf}\Getsu
+DefaultDirName={autopf}\DeepNoise
 AppendDefaultDirName=yes
 DisableDirPage=no
 DisableProgramGroupPage=yes
 PrivilegesRequired=admin
 OutputDir=dist\installer
-OutputBaseFilename=Getsu-v{#MyAppVersion}-Setup
-SetupIconFile=getsu.ico
+OutputBaseFilename=DeepNoise-v{#MyAppVersion}-Setup
+SetupIconFile=deepnoise.ico
 Compression=lzma2/max
 SolidCompression=yes
 WizardStyle=modern
-UninstallDisplayIcon={app}\getsu.exe
+UninstallDisplayIcon={app}\deepnoise.exe
 CloseApplications=force
 RestartApplications=no
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 VersionInfoVersion={#MyAppVersion}.0
-VersionInfoCompany=skttr87
-VersionInfoDescription=Getsu - AI Real-Time Noise Cancellation Setup
-VersionInfoCopyright=Copyright (c) 2026 Ihsan (@skttr87)
-VersionInfoProductName=Getsu AI Noise Cancellation
+VersionInfoCompany=loredounipass
+VersionInfoDescription=DeepNoise - AI Real-Time Noise Cancellation Setup
+VersionInfoCopyright=Copyright (c) 2026 loredounipass
+VersionInfoProductName=DeepNoise AI Noise Cancellation
 VersionInfoProductVersion={#MyAppVersion}
-VersionInfoOriginalFileName=Getsu-v{#MyAppVersion}-Setup.exe
+VersionInfoOriginalFileName=DeepNoise-v{#MyAppVersion}-Setup.exe
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Messages]
-UninstallAppTitle=Getsu Uninstaller
-UninstallAppFullTitle=Getsu Uninstaller
-FinishedLabel=Setup has finished installing [name] on your computer.%n%nNotice: Keep your normal Speakers or Headphones selected for your Windows sound (taskbar volume icon). Getsu will automatically route your clean microphone to your games and voice apps.
+UninstallAppTitle=DeepNoise Uninstaller
+UninstallAppFullTitle=DeepNoise Uninstaller
+FinishedLabel=Setup has finished installing [name] on your computer.%n%nNotice: Keep your normal Speakers or Headphones selected for your Windows sound (taskbar volume icon). DeepNoise will automatically route your clean microphone to your games and voice apps.
 
 [Tasks]
 Name: "installvbcable"; Description: "Install VB-Audio Virtual Cable (Recommended: routes clean audio to all voice apps and games)"; GroupDescription: "Virtual Audio Components:"; Flags: checkedonce
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
-Name: "addtopath"; Description: "Add Getsu CLI to system PATH (enables running 'getsu-cli --clean' in any terminal)"; GroupDescription: "Command-Line Tools:"; Flags: unchecked
+Name: "addtopath"; Description: "Add DeepNoise CLI to system PATH (enables running 'deepnoise-cli --clean' in any terminal)"; GroupDescription: "Command-Line Tools:"; Flags: unchecked
 
 [Registry]
 Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"; \
@@ -63,7 +63,7 @@ Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environmen
 
 [Files]
 ; Compiled application files and bundled internal dependencies (preserve existing user config.json on upgrade)
-Source: "dist\getsu\*"; DestDir: "{app}"; Excludes: "config.json"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "dist\deepnoise\*"; DestDir: "{app}"; Excludes: "config.json"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; Default config file: only installed if config.json does not already exist in destination
 Source: "config.json"; DestDir: "{app}"; Flags: onlyifdoesntexist
 ; Bundled virtual audio cable driver
@@ -71,14 +71,14 @@ Source: "drivers\vbcable\*"; DestDir: "{app}\drivers\vbcable"; Flags: ignorevers
 ; Project assets & license
 Source: "LICENSE"; DestDir: "{app}"; Flags: ignoreversion
 Source: "README.md"; DestDir: "{app}"; Flags: ignoreversion
-Source: "getsu.ico"; DestDir: "{app}"; Flags: ignoreversion
+Source: "deepnoise.ico"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
-Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; IconFilename: "{app}\getsu.ico"
-Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; IconFilename: "{app}\getsu.ico"; Tasks: desktopicon
+Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; IconFilename: "{app}\deepnoise.ico"
+Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; IconFilename: "{app}\deepnoise.ico"; Tasks: desktopicon
 
 [InstallDelete]
-Type: files; Name: "{autoprograms}\Getsu Uninstaller.lnk"
+Type: files; Name: "{autoprograms}\DeepNoise Uninstaller.lnk"
 
 [UninstallDelete]
 Type: files; Name: "{app}\config.json"
@@ -190,7 +190,7 @@ begin
   end;
 end;
 
-// Queries Windows registry for currently installed Getsu version
+// Queries Windows registry for currently installed DeepNoise version
 function GetInstalledVersion(): String;
 var
   Key: String;
@@ -221,7 +221,7 @@ begin
     begin
       if not WizardSilent then
       begin
-        MsgBox('A newer version of Getsu (' + InstalledVer + ') is already installed on your computer.' + #13#10 + #13#10 +
+        MsgBox('A newer version of DeepNoise (' + InstalledVer + ') is already installed on your computer.' + #13#10 + #13#10 +
                'Installing an older version (' + '{#MyAppVersion}' + ') is not supported.' + #13#10 + #13#10 +
                'If you wish to downgrade, please uninstall the newer version first via Windows Settings -> Installed Apps.',
                mbError, MB_OK);
@@ -231,7 +231,7 @@ begin
   end;
 end;
 
-// Automatically and cleanly terminate running Getsu processes before files are overwritten
+// Automatically and cleanly terminate running DeepNoise processes before files are overwritten
 function PrepareToInstall(var NeedsRestart: Boolean): String;
 var
   ResultCode: Integer;
@@ -248,14 +248,14 @@ begin
     Exec(AudioRestoreExe, '--ensure-physical-capture', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
   end;
 
-  // 2. Forcibly close any running getsu.exe processes so binaries and DLLs in {app} are unlocked
-  Exec('taskkill.exe', '/F /T /IM getsu.exe', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+  // 2. Forcibly close any running deepnoise.exe processes so binaries and DLLs in {app} are unlocked
+  Exec('taskkill.exe', '/F /T /IM deepnoise.exe', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
 
   // Give Windows 500ms to flush file handles
   Sleep(500);
 end;
 
-// Enforce that installation folder always has a dedicated \Getsu subfolder
+// Enforce that installation folder always has a dedicated \DeepNoise subfolder
 function NextButtonClick(CurPageID: Integer): Boolean;
 var
   SelectedPath: String;
@@ -264,10 +264,10 @@ begin
   if CurPageID = wpSelectDir then
   begin
     SelectedPath := WizardDirValue;
-    // If the chosen directory name is not already 'Getsu', append \Getsu
-    if Uppercase(ExtractFileName(SelectedPath)) <> 'GETSU' then
+    // If the chosen directory name is not already 'DeepNoise', append \DeepNoise
+    if Uppercase(ExtractFileName(SelectedPath)) <> 'DEEPNOISE' then
     begin
-      WizardForm.DirEdit.Text := AddBackslash(SelectedPath) + 'Getsu';
+      WizardForm.DirEdit.Text := AddBackslash(SelectedPath) + 'DeepNoise';
     end;
   end;
 end;
@@ -293,8 +293,8 @@ begin
     Exec(AudioRestoreExe, '--ensure-physical-capture', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
   end;
 
-  // 2. Forcibly terminate running getsu.exe processes so binaries and DLLs can be completely removed
-  Exec('taskkill.exe', '/F /T /IM getsu.exe', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+  // 2. Forcibly terminate running deepnoise.exe processes so binaries and DLLs can be completely removed
+  Exec('taskkill.exe', '/F /T /IM deepnoise.exe', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
 
   // Give Windows 500ms to flush file handles
   Sleep(500);
@@ -327,7 +327,7 @@ begin
     Result := Pos(';' + UpperCase(Param) + ';', ';' + UpperCase(OrigPath) + ';') = 0;
 end;
 
-// Execute driver uninstaller before Getsu files are removed, then clean up leftover files
+// Execute driver uninstaller before DeepNoise files are removed, then clean up leftover files
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
 var
   ResultCode: Integer;
@@ -353,12 +353,12 @@ begin
     end;
     AudioRestoreExe := AddBackslash(AppDir) + 'drivers\vbcable\AudioRestore.exe';
 
-    // Ensure microphone endpoint is physical and getsu is dead before file deletion
+    // Ensure microphone endpoint is physical and deepnoise is dead before file deletion
     if FileExists(AudioRestoreExe) then
     begin
       Exec(AudioRestoreExe, '--ensure-physical-capture', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
     end;
-    Exec('taskkill.exe', '/F /T /IM getsu.exe', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+    Exec('taskkill.exe', '/F /T /IM deepnoise.exe', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
     Sleep(300);
 
     if RemoveVBCableRequested then
@@ -377,10 +377,10 @@ begin
     if FileExists(AddBackslash(AppDir) + 'config.json') then
       DeleteFile(AddBackslash(AppDir) + 'config.json');
 
-    // Clean up %APPDATA%\Getsu\config.json and folder
-    if FileExists(ExpandConstant('{userappdata}\Getsu\config.json')) then
-      DeleteFile(ExpandConstant('{userappdata}\Getsu\config.json'));
-    RemoveDir(ExpandConstant('{userappdata}\Getsu'));
+    // Clean up %APPDATA%\DeepNoise\config.json and folder
+    if FileExists(ExpandConstant('{userappdata}\DeepNoise\config.json')) then
+      DeleteFile(ExpandConstant('{userappdata}\DeepNoise\config.json'));
+    RemoveDir(ExpandConstant('{userappdata}\DeepNoise'));
 
     // Safely remove folders ONLY if completely empty (Win32 RemoveDirectory)
     // This strictly protects user files: if the folder contains personal documents or is a user profile,
@@ -418,7 +418,7 @@ begin
 
     // Only run driver setup in interactive mode if explicitly selected by the user.
     // In silent/unattended mode (e.g. winget /VERYSILENT), driver install is skipped to avoid modal dialog hangs.
-    // Getsu will prompt cleanly in-app upon first launch if the driver is not yet present.
+    // DeepNoise will prompt cleanly in-app upon first launch if the driver is not yet present.
     if NeedsInstall and (not WizardSilent) and WizardIsTaskSelected('installvbcable') then
     begin
       // 1. Backup current default playback device (Speakers) and capture device (Microphone)

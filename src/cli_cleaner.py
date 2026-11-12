@@ -1,5 +1,5 @@
 """
-Getsu Headless Audio Cleaner & Batch CLI Processor.
+DeepNoise Headless Audio Cleaner & Batch CLI Processor.
 Universal format decoding via miniaudio, 48kHz resampling, sample-accurate duration trimming,
 zero-flush latency extraction, linked-stereo gating, and TPDF dithered 16-bit PCM WAV export.
 """
@@ -373,10 +373,10 @@ def print_stats_table(results: List[Dict[str, Any]]):
 
 
 def build_arg_parser() -> argparse.ArgumentParser:
-    """Builds command-line parser for Getsu CLI."""
+    """Builds command-line parser for DeepNoise CLI."""
     parser = argparse.ArgumentParser(
-        prog="getsu-cli",
-        description="Getsu AI Noise Cancellation - High-Performance Headless Audio Cleaner",
+        prog="deepnoise-cli",
+        description="DeepNoise AI Noise Cancellation - High-Performance Headless Audio Cleaner",
     )
     parser.add_argument(
         "--clean",

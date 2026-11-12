@@ -1,5 +1,5 @@
 """
-Unit Tests for Getsu Headless CLI Batch Audio Processor.
+Unit Tests for DeepNoise Headless CLI Batch Audio Processor.
 Tests sample-accurate duration matching, 44.1kHz -> 48kHz resampling, linked stereo,
 overwrite guards, and telemetry reporting.
 """

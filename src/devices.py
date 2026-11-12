@@ -1,5 +1,5 @@
 """
-Audio Device Enumeration and VB-Audio Virtual Cable Management for Getsu.
+Audio Device Enumeration and VB-Audio Virtual Cable Management for DeepNoise.
 """
 import os
 import sys
@@ -154,7 +154,7 @@ def check_vbcable_status(force_rescan: bool = False) -> Tuple[bool, Optional[Dic
     Checks if VB-Audio Virtual Cable is installed and available.
     Returns: (is_installed, cable_input_playback, cable_output_recording)
     Note:
-      - 'CABLE Input' is a PLAYBACK device where Getsu sends denoised audio.
+      - 'CABLE Input' is a PLAYBACK device where DeepNoise sends denoised audio.
       - 'CABLE Output' is a RECORDING device where Steam/Zoom listens.
     """
     devices = get_all_devices(force_rescan=force_rescan)
@@ -194,7 +194,7 @@ def check_vbcable_status(force_rescan: bool = False) -> Tuple[bool, Optional[Dic
     if has_win_cable and not force_rescan:
         return check_vbcable_status(force_rescan=True)
 
-    # If PortAudio sees cable_input (where Getsu sends audio) and Windows has the driver:
+    # If PortAudio sees cable_input (where DeepNoise sends audio) and Windows has the driver:
     if cable_input is not None and has_win_cable:
         fallback_output = cable_output or {'index': -1, 'name': 'CABLE Output (Windows Audio)'}
         return True, cable_input, fallback_output
@@ -446,7 +446,7 @@ def install_vbcable_driver() -> bool:
         print(f"[ERROR] Driver setup not found at: {setup_exe}")
         return False
 
-    backup_file = os.path.join(os.environ.get("TEMP", "C:\\Windows\\Temp"), "getsu_audio_backup.txt")
+    backup_file = os.path.join(os.environ.get("TEMP", "C:\\Windows\\Temp"), "deepnoise_audio_backup.txt")
 
     # 1. Pre-backup physical playback endpoint
     if os.path.exists(restore_exe):
@@ -525,7 +525,7 @@ def install_vbcable_driver() -> bool:
 def print_device_report():
     """Prints a clear startup diagnostic report of audio devices."""
     print("=" * 70)
-    print("                 GETSU AUDIO DEVICE DIAGNOSTICS")
+    print("               DEEPNOISE AUDIO DEVICE DIAGNOSTICS")
     print("=" * 70)
 
     # VB-Cable status

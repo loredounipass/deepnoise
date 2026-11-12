@@ -45,7 +45,7 @@ def explain_start_error(exc: BaseException) -> ExplainedError:
         return make(
             "wdmks",
             "This microphone entry uses an audio path your driver doesn't support",
-            "Pick the same microphone again from the list (Getsu now uses the standard Windows audio path). "
+            "Pick the same microphone again from the list (DeepNoise now uses the standard Windows audio path). "
             "If it keeps happening, check that the microphone is plugged in firmly.",
         )
     if code == -9985:
@@ -77,13 +77,13 @@ def explain_start_error(exc: BaseException) -> ExplainedError:
         return make(
             "channels",
             "The device channel layout is unsupported",
-            "Getsu supports 1-channel (mono) and 2-channel (stereo) microphones. Check Windows Sound properties.",
+            "DeepNoise supports 1-channel (mono) and 2-channel (stereo) microphones. Check Windows Sound properties.",
         )
     if code == -9984:
         return make(
             "host_settings",
             "Audio driver settings rejected",
-            "Try toggling the microphone in the dropdown or restarting Getsu.",
+            "Try toggling the microphone in the dropdown or restarting DeepNoise.",
         )
     if code == -9999:
         return make(

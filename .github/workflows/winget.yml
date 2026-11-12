@@ -9,9 +9,9 @@ jobs:
   publish:
     runs-on: windows-latest
     steps:
-      - name: Publish Getsu to WinGet Community Repository
+      - name: Publish DeepNoise to WinGet Community Repository
         uses: vedantmgoyal2009/winget-releaser@v2
         with:
-          identifier: skttr87.getsu
+          identifier: skttr87.deepnoise
           installer-type: inno
           token: ${{ secrets.WINGET_TOKEN }}

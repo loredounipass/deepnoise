@@ -1,5 +1,5 @@
 """
-Low-Latency Audio Streaming Engine for Getsu.
+Low-Latency Audio Streaming Engine for DeepNoise.
 Synchronous WASAPI duplex streaming with in-flight DSP and RNNoise neural filter.
 """
 import time

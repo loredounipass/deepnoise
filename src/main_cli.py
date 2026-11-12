@@ -1,5 +1,5 @@
 """
-Getsu CLI Main Entry Point (getsu-cli.exe).
+DeepNoise CLI Main Entry Point (deepnoise-cli.exe).
 Console subsystem executable running synchronously in terminals and CI pipelines.
 Completely decoupled from GUI single-instance mutex locks.
 """

@@ -14,7 +14,7 @@ class TestDeviceHotplug(unittest.TestCase):
             with lock:
                 call_count += 1
 
-        # Simulate GetsuGUI debounce logic
+        # Simulate DeepNoise debounce logic
         timer = None
         timer_lock = threading.Lock()
 
@@ -66,7 +66,7 @@ class TestDeviceHotplug(unittest.TestCase):
         is_disconnected = (selected_input_name not in new_devices)
         self.assertTrue(is_disconnected, "Name-based check correctly identifies MPOW was unplugged")
 
-        # Simulate Getsu fallback behavior
+        # Simulate DeepNoise fallback behavior
         if is_disconnected:
             fallback_name = "Realtek High Definition Audio"
             selected_input_idx = new_devices[fallback_name]

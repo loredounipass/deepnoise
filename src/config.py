@@ -1,5 +1,5 @@
 """
-Configuration Management for Getsu.
+Configuration Management for DeepNoise.
 Saves and loads user audio preferences to config.json.
 """
 import os
@@ -43,8 +43,8 @@ def get_config_path() -> str:
     """
     Determines writable path for config.json.
     - Source / dev mode: uses root/config.json
-    - Frozen portable mode: if directory next to getsu.exe is writable, uses it.
-    - Frozen installed mode: uses %APPDATA%\\Getsu\\config.json.
+    - Frozen portable mode: if directory next to deepnoise.exe is writable, uses it.
+    - Frozen installed mode: uses %APPDATA%\\DeepNoise\\config.json.
     """
     if getattr(sys, 'frozen', False):
         app_dir = os.path.dirname(sys.executable)
@@ -59,8 +59,8 @@ def get_config_path() -> str:
         except Exception:
             pass
 
-        # Standard Windows Installed Application Mode: %APPDATA%\Getsu\config.json
-        appdata_dir = os.path.join(os.environ.get("APPDATA", os.path.expanduser("~")), "Getsu")
+        # Standard Windows Installed Application Mode: %APPDATA%\DeepNoise\config.json
+        appdata_dir = os.path.join(os.environ.get("APPDATA", os.path.expanduser("~")), "DeepNoise")
         try:
             os.makedirs(appdata_dir, exist_ok=True)
         except Exception:

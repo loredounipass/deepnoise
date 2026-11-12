@@ -1,5 +1,5 @@
 """
-Digital Signal Processing (DSP) Module for Getsu.
+Digital Signal Processing (DSP) Module for DeepNoise.
 Features:
 - Biquad High-Pass Filter (80Hz Butterworth rumble filter for cooling pads / desk bumps)
 - Adaptive Soft-Knee Noise Gate with Hangover (eliminates cooling pad fan hiss between words)

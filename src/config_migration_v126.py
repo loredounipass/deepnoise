@@ -1,5 +1,5 @@
 """
-v1.2.6 config migration for Getsu (invoked from src/config.py:load_config).
+v1.2.6 config migration for DeepNoise (invoked from src/config.py:load_config).
 
 Features:
 - Runs ONCE, only when the stored version is not 1.2.6, so any value the user sets later

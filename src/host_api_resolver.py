@@ -1,5 +1,5 @@
 """
-Host API resolver for Getsu streams.
+Host API resolver for DeepNoise streams.
 
 Why: PortAudio's WDM-KS backend fails on many Realtek endpoints (GLE 0x492 /
 ERROR_SET_NOT_FOUND). A duplex stream also needs input and output on the SAME host API.

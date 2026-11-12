@@ -1,5 +1,5 @@
 """
-System Tray User Interface for Getsu using pystray and Pillow.
+System Tray User Interface for DeepNoise using pystray and Pillow.
 Provides real-time tray menu, status indicator icon, and quick controls.
 """
 import threading
@@ -64,7 +64,7 @@ class TrayApp:
         if self._icon:
             status = self._get_status_str()
             self._icon.icon = create_tray_image(status)
-            title = f"Getsu: {status.upper()}"
+            title = f"DeepNoise: {status.upper()}"
             if self.engine.is_muted:
                 title += " (Muted)"
             elif not self.engine.denoise_enabled:
@@ -145,7 +145,7 @@ class TrayApp:
         self._icon.update_menu()
 
     def _on_exit(self, icon, item):
-        print("[UI] Exiting Getsu...")
+        print("[UI] Exiting DeepNoise...")
         try:
             self.engine.prepare_for_stop()
         finally:
@@ -179,7 +179,7 @@ class TrayApp:
         from src.config import APP_VERSION
         version = APP_VERSION
         menu_entries = [
-            item(f"Getsu AI Noise Cancellation v{version}", None, enabled=False),
+            item(f"DeepNoise AI Noise Cancellation v{version}", None, enabled=False),
 
             item(
                 lambda text: f"Status: {self._get_status_str().upper()}",
@@ -214,11 +214,11 @@ class TrayApp:
             )
             menu_entries.append(pystray.Menu.SEPARATOR)
 
-        menu_entries.append(item("Exit Getsu", self._on_exit))
+        menu_entries.append(item("Exit DeepNoise", self._on_exit))
         return Menu(*menu_entries)
 
     def run(self):
         """Runs the tray icon event loop."""
         initial_img = create_tray_image(self._get_status_str())
-        self._icon = pystray.Icon("getsu", initial_img, "Getsu Real-Time Noise Suppression", self._build_menu())
+        self._icon = pystray.Icon("deepnoise", initial_img, "DeepNoise Real-Time Noise Suppression", self._build_menu())
         self._icon.run()

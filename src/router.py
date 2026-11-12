@@ -1,5 +1,5 @@
 """
-Smart Microphone Routing and Windows CoreAudio Endpoint Management for Getsu.
+Smart Microphone Routing and Windows CoreAudio Endpoint Management for DeepNoise.
 Orchestrates automatic hot-swapping to CABLE Output on START,
 and clean restoration of physical microphones on STOP, EXIT, or CRASH.
 
@@ -24,13 +24,13 @@ except ImportError:
 from logging.handlers import RotatingFileHandler
 
 # Configure file + console logger for routing audit
-logger = logging.getLogger("GetsuRouter")
+logger = logging.getLogger("DeepNoiseRouter")
 if not logger.handlers:
     logger.setLevel(logging.INFO)
     try:
-        appdata_dir = os.path.join(os.environ.get("APPDATA", os.path.expanduser("~")), "Getsu")
+        appdata_dir = os.path.join(os.environ.get("APPDATA", os.path.expanduser("~")), "DeepNoise")
         os.makedirs(appdata_dir, exist_ok=True)
-        log_file = os.path.join(appdata_dir, "getsu.log")
+        log_file = os.path.join(appdata_dir, "deepnoise.log")
         fh = RotatingFileHandler(log_file, maxBytes=2 * 1024 * 1024, backupCount=2, encoding="utf-8")
         fh.setFormatter(logging.Formatter("[%(asctime)s] [%(levelname)s] [ROUTER] %(message)s"))
         logger.addHandler(fh)
@@ -817,7 +817,7 @@ class SmartMicRouter:
 
     def audit_crash_recovery(self) -> bool:
         """
-        Audits config on startup to recover if Getsu crashed while swapped.
+        Audits config on startup to recover if DeepNoise crashed while swapped.
         Heals Windows audio state automatically.
         """
         if not self.config.get("is_swapped", False):

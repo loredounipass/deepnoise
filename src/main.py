@@ -1,5 +1,5 @@
 """
-Getsu - Real-Time AI Noise Cancellation Application.
+DeepNoise - Real-Time AI Noise Cancellation Application.
 Main entry point orchestrating GUI, device checks, audio engine, and system tray.
 """
 import os
@@ -11,7 +11,7 @@ import argparse
 # Ensure project root is in sys.path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-# Fast Single-Instance Micro-Checker (exits in <5ms if Getsu is already running)
+# Fast Single-Instance Micro-Checker (exits in <5ms if DeepNoise is already running)
 if not any(arg in sys.argv for arg in ("--check-devices", "--install-driver", "-h", "--help", "--cli", "--clean", "--batch")):
     from src.single_instance import activate_existing_instance
     if activate_existing_instance():
@@ -35,7 +35,7 @@ from src.gui import launch_gui
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="Getsu - Real-Time AI Noise Filter")
+    parser = argparse.ArgumentParser(description="DeepNoise - Real-Time AI Noise Filter")
     parser.add_argument("--cli", action="store_true", help="Run in interactive CLI mode without GUI")
     parser.add_argument("--tray", action="store_true", help="Run in background system tray mode")
     parser.add_argument("--check-devices", action="store_true", help="Print audio device diagnostics and exit")
@@ -59,7 +59,7 @@ def run_tray_mode():
     engine = create_engine_from_config(config, input_device_id, output_device_id, router=router)
     engine.start()
 
-    print("\n[GETSU] Starting Windows System Tray...")
+    print("\n[DEEPNOISE] Starting Windows System Tray...")
     tray = TrayApp(engine, config)
     tray.run()
 
@@ -80,12 +80,12 @@ def run_cli_mode():
     engine.start()
 
     def shutdown(sig=None, frame=None):
-        print("\n[GETSU] Stopping audio engine...")
+        print("\n[DEEPNOISE] Stopping audio engine...")
         engine.prepare_for_stop()
         sys.exit(0)
 
     signal.signal(signal.SIGINT, shutdown)
-    print("\n[GETSU] Running in CLI Monitor Mode (Press Ctrl+C to stop)")
+    print("\n[DEEPNOISE] Running in CLI Monitor Mode (Press Ctrl+C to stop)")
     print("Cooling Pad Filter: ON | AI Denoise: ON | Buffer: 10ms")
     print("-" * 65)
     try:

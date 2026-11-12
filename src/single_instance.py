@@ -1,6 +1,6 @@
 """
-Getsu - Single Instance Manager (Micro-Checker).
-Ensures only one instance of Getsu runs at any time.
+DeepNoise - Single Instance Manager (Micro-Checker).
+Ensures only one instance of DeepNoise runs at any time.
 If an instance is already running (visible or hidden in tray),
 brings it to the foreground instantly (~3ms) and exits the new process
 without loading heavy libraries (no audio, no UI, no neural model).
@@ -10,16 +10,16 @@ import time
 import ctypes
 import atexit
 
-MUTEX_NAME = "Local\\Getsu_SingleInstance_Mutex_8F9A"
-WINDOW_TITLE = "Getsu - AI Noise Cancellation"
-REGISTERED_MSG_NAME = "GETSU_RESTORE_WINDOW_MSG"
+MUTEX_NAME = "Local\\DeepNoise_SingleInstance_Mutex_8F9A"
+WINDOW_TITLE = "DeepNoise - AI Noise Cancellation"
+REGISTERED_MSG_NAME = "DEEPNOISE_RESTORE_WINDOW_MSG"
 
 _app_mutex = None  # Global reference to prevent GC from closing handle
 
 
 def activate_existing_instance(mutex_name: str = MUTEX_NAME) -> bool:
     """
-    Checks if another instance of Getsu is already running.
+    Checks if another instance of DeepNoise is already running.
     - If yes: Finds the existing window (even if minimized or hidden in tray),
       restores it, brings it to foreground, and returns True.
     - If no: Holds the mutex handle and returns False.

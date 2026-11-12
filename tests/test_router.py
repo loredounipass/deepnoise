@@ -232,10 +232,10 @@ class TestAutoRouteToggleLock(unittest.TestCase):
         import threading
         mock_gui._state_lock = threading.Lock()
 
-        from src.gui import GetsuGUI
+        from src.gui import DeepNoiseGUI
         with patch("src.gui.dpg.does_item_exist", return_value=True), \
              patch("src.gui.dpg.set_value") as mock_set_val:
-            GetsuGUI.on_auto_route_toggled(mock_gui, "chk_auto_route", False)
+            DeepNoiseGUI.on_auto_route_toggled(mock_gui, "chk_auto_route", False)
             mock_set_val.assert_called_with("chk_auto_route", True)
             mock_gui.set_status_pill.assert_called_once_with(
                 "▲ Stop noise cancellation first to change routing preference.", [240, 180, 50]
@@ -252,9 +252,9 @@ class TestAutoRouteToggleLock(unittest.TestCase):
         mock_gui._get_idle_status.return_value = "Ready"
         mock_gui._get_idle_color.return_value = [100, 100, 100]
 
-        from src.gui import GetsuGUI
+        from src.gui import DeepNoiseGUI
         with patch("src.gui.save_config") as mock_save:
-            GetsuGUI.on_auto_route_toggled(mock_gui, "chk_auto_route", False)
+            DeepNoiseGUI.on_auto_route_toggled(mock_gui, "chk_auto_route", False)
             self.assertFalse(mock_gui.config["auto_route"])
             mock_save.assert_called_once()
             mock_gui.set_status_pill.assert_called_with("Ready", [100, 100, 100])

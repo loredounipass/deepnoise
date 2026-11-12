@@ -11,8 +11,8 @@ datas = [
     (os.path.join(project_root, "src", "native", "rnnoise.dll"), os.path.join("src", "native")),
     (os.path.join(project_root, "drivers", "vbcable"), os.path.join("drivers", "vbcable")),
     (os.path.join(project_root, "assets", "fonts"), os.path.join("assets", "fonts")),
-    (os.path.join(project_root, "getsu-icon.png"), "."),
-    (os.path.join(project_root, "getsu.ico"), "."),
+    (os.path.join(project_root, "deepnoise-icon.png"), "."),
+    (os.path.join(project_root, "deepnoise.ico"), "."),
     (os.path.join(project_root, "CHANGELOG.md"), "."),
     (os.path.join(project_root, "config.json"), "."),
 ]
@@ -87,7 +87,7 @@ exe_gui = EXE(
     a.scripts,
     [],
     exclude_binaries=True,
-    name='getsu',
+    name='deepnoise',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -98,8 +98,9 @@ exe_gui = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=os.path.join(project_root, "getsu.ico"),
+    icon=os.path.join(project_root, "deepnoise.ico"),
     version=os.path.join(project_root, "build", "version_info.txt"),
+    manifest=os.path.join(project_root, "build", "deepnoise.manifest"),
 )
 
 exe_cli = EXE(
@@ -107,7 +108,7 @@ exe_cli = EXE(
     a_cli.scripts,
     [],
     exclude_binaries=True,
-    name='getsu-cli',
+    name='deepnoise-cli',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -118,8 +119,9 @@ exe_cli = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=os.path.join(project_root, "getsu.ico"),
+    icon=os.path.join(project_root, "deepnoise.ico"),
     version=os.path.join(project_root, "build", "version_info_cli.txt"),
+    manifest=os.path.join(project_root, "build", "deepnoise.manifest"),
 )
 
 coll = COLLECT(
@@ -131,5 +133,5 @@ coll = COLLECT(
     strip=False,
     upx=False,
     upx_exclude=[],
-    name='getsu',
+    name='deepnoise',
 )

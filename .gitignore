@@ -12,7 +12,8 @@ __pycache__/
 # Distribution / packaging
 dist/
 build/*
-!build/getsu.spec
+!build/deepnoise.spec
+!build/deepnoise.manifest
 !build/version_info.txt
 !build/version_info_cli.txt
 *.egg-info/

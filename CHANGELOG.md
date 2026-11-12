@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to **Getsu (AI Real-Time Noise Cancellation)** are documented in this file.
+All notable changes to **DeepNoise (AI Real-Time Noise Cancellation)** are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
@@ -33,8 +33,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.3.0] - 2026-10-10
 
-- **Dual-Binary Architecture & Batch CLI Engine (`getsu-cli.exe` & `getsu.exe`)**:
-  - Introduced dedicated console-subsystem binary (`getsu-cli.exe`, `console=True`) alongside the GUI app (`getsu.exe`, `console=False`), ensuring full synchronous execution in PowerShell/cmd and reliable `$LASTEXITCODE` returns.
+- **Dual-Binary Architecture & Batch CLI Engine (`deepnoise-cli.exe` & `deepnoise.exe`)**:
+  - Introduced dedicated console-subsystem binary (`deepnoise-cli.exe`, `console=True`) alongside the GUI app (`deepnoise.exe`, `console=False`), ensuring full synchronous execution in PowerShell/cmd and reliable `$LASTEXITCODE` returns.
   - Decoupled CLI batch cleaning from GUI single-instance mutex locks (`activate_existing_instance()`), allowing real-time desktop filtering and offline batch file cleaning to run simultaneously without interference.
   - Production-grade batch cleaner with universal format decoding (`miniaudio`), automatic 48 kHz resampling, sample-accurate duration trimming, 2-frame zero-flush latency extraction, and TPDF-dithered 16-bit PCM output.
   - Coupled Linked-Stereo Gating (`--stereo`): Synchronized master gain envelope across multi-channel audio eliminating stereo panning image wobble.
@@ -53,7 +53,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Synchronized friendly device names alongside IDs in `src/tray.py`, and isolated runtime `mute` to prevent ephemeral state pollution in `config.json`.
 - **Packaging & Windows PATH Integration**:
   - Inno Setup `setup.iss` integration with `ChangesEnvironment=yes`, optional PATH registration task (`addtopath`), and clean uninstall routines.
-  - Updated PyInstaller spec and `scripts/publish.py` pipeline auditing both `getsu.exe` and `getsu-cli.exe` binaries before release.
+  - Updated PyInstaller spec and `scripts/publish.py` pipeline auditing both `deepnoise.exe` and `deepnoise-cli.exe` binaries before release.
 
 ---
 
@@ -71,7 +71,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Host-API Tiering & Deduplicated Safe Inputs (`list_selectable_inputs`)**: Enumerate physical recording endpoints using modern Windows CoreAudio (WASAPI) as the authoritative hardware layer, completely pruning synthetic Win32 proxy mappers (`Microsoft Sound Mapper`, `Primary Sound Capture Driver`) across all Windows locales. Virtual cable bridges (`CABLE Output`) are strictly excluded to prevent infinite feedback loops.
 - **Hardware Channel Count Fidelity**: Capture authentic mono/stereo input channels (`SelectableInput.channels`) directly from device capabilities rather than hardcoded layouts.
-- **Dynamic Wrong-Jack Advisory (`selection_hint`)**: Added contextual, real-time UX hints beneath the microphone dropdown in `gui.py`. If a user selects `Line In` or `Stereo Mix`, Getsu immediately warns them and points them to the pink `Microphone` entry before stream initiation.
+- **Dynamic Wrong-Jack Advisory (`selection_hint`)**: Added contextual, real-time UX hints beneath the microphone dropdown in `gui.py`. If a user selects `Line In` or `Stereo Mix`, DeepNoise immediately warns them and points them to the pink `Microphone` entry before stream initiation.
 - **Granular PortAudio Error Diagnosis (`src/audio_errors.py`)**: Replaced generic `"driver conflict"` error banners with actionable, plain-language diagnosis for specific PortAudio error codes (`-9985` busy/exclusive mode, `-9997` sample rate mismatch, `-9993` host mismatch, `-9999` host error) while preserving up to 400 characters of raw technical error text for logs.
 - **Targeted Transient Stream Retry**: Audio stream retry loop now specifically retries on transient `-9985` (`PaErrorCode -9985` device busy / exclusive lock) rather than wasting 700ms on unrecoverable disconnected hardware errors.
 - **Subscripting Compatibility & Hardening**: Implemented dictionary subscripting (`item['index']`, `item['name']`) on `SelectableInput` dataclass to ensure backwards compatibility across `devices.py` and UI lookups.
@@ -123,7 +123,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Optimized Dynamic Expander Floor (`floor_gain = 0.06` / -24.4 dB)**: Calibrated gate floor baseline to `0.06` (-24.4 dB). Keeps wireless headset DAC amplifiers (e.g. MPOW 2.4GHz) reliably energized with a solid $\approx 3\text{ LSB}$ pilot signal across prolonged silence (> 30s) so hardware squelch circuits never enter sleep/standby mode, while maintaining dead digital black silence at **-89 dBFS to -94 dBFS** (10 dB beneath human hearing and 44 dB beneath Discord's -45 dBFS VAD floor).
 - **Smooth Syllable Attack Curve (`attack_ms = 22.0ms`)**: Paired the `0.06` floor with a smoothed `22.0ms` attack envelope. Drops the Frame 1 onset step surge by **$9.1\text{ dB}$** (from $+26.4\text{ dB}$ down to $+17.3\text{ dB}$), eliminating the leading-edge harshness after prolonged silence and allowing RNNoise recurrent GRU states to converge smoothly while consonants are fully preserved by the 10ms pre-roll lookahead buffer.
 - **Immunity to Background Chatter (`onset_snr_db = 8.0 dB`)**: Raised onset threshold to require a $2.51\times$ amplitude jump ($6.31\times$ power increase) above ambient cooling pad noise, completely preventing distant room chatter and family members from false-triggering the gate.
-- **Zero Audio Output Interference**: Eliminated all playback device tampering across the entire app lifecycle. Removed background playback guards (`_check_playback_guard` in `src/gui.py`) and installer overrides (`--ensure-physical` in `setup.iss`). Getsu now strictly operates on audio input (`eCapture`), leaving whatever playback endpoint is chosen by Windows or the user (USB/Wireless headsets, Bluetooth, DACs, HDMI, speakers) 100% untouched during installation, launch, stream start, stream stop, and exit.
+- **Zero Audio Output Interference**: Eliminated all playback device tampering across the entire app lifecycle. Removed background playback guards (`_check_playback_guard` in `src/gui.py`) and installer overrides (`--ensure-physical` in `setup.iss`). DeepNoise now strictly operates on audio input (`eCapture`), leaving whatever playback endpoint is chosen by Windows or the user (USB/Wireless headsets, Bluetooth, DACs, HDMI, speakers) 100% untouched during installation, launch, stream start, stream stop, and exit.
 - **Direct WASAPI Headset Playback for Voice Test**: Fixed `get_physical_output_device()` in `src/devices.py` to query the active Windows WASAPI default playback device directly. "Hear Myself (11s Voice Test)" now reliably plays clean audio into your active USB/Wireless headset without falling back to motherboard Realtek speakers.
 - **1-Frame (10ms) Pre-roll Lookahead Buffer**: Added an ultra-low-latency 10ms pre-roll lookahead buffer to `AdaptiveNoiseGate`. When speech begins after long silence, the gate ramps open smoothly across the pre-roll frame *before* the syllable peaks, passing your natural voice with 100% full fidelity and zero muffling, zero harshness, and zero perceptible delay.
 - **Synchronized Voice Test Pipeline**: Synced all DSP parameters (`hangover_ms=360`, `decay_ms=80`, `attack_ms=22.0`, `floor_gain=0.06`, `onset_snr_db=8.0`, `lookahead=True`) in the Voice Test worker with the live stream pipeline.
@@ -170,7 +170,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **5-Vector Audio Restoration Architecture**: Guarantees physical microphones are seamlessly restored across all stop and exit vectors: GUI Stop button, System Tray exit, Window close, OS shutdown (`WM_ENDSESSION`), and Watchdog emergency auto-restore.
 - **"Hear Myself" 11-Second Voice Preview Test**: In-memory test recording and playing back 11 seconds of filtered voice with physical speakers muted during recording (zero acoustic feedback loop) and zero disk clutter.
 - **Real-Time Voice Sensitivity Threshold Slider**: Thread-safe live float slider (`0.40 - 0.90`) for fine-tuning voice detection vs. background noise in real-time.
-- **Crash-Proof Atomic Configuration Management (`src/config.py`)**: Replaced truncating file writes with temporary file replacement and exponential backoff retry for transient Windows Defender file inspection locks (`WinError 32`), with `%APPDATA%\Getsu` storage for installed mode.
+- **Crash-Proof Atomic Configuration Management (`src/config.py`)**: Replaced truncating file writes with temporary file replacement and exponential backoff retry for transient Windows Defender file inspection locks (`WinError 32`), with `%APPDATA%\DeepNoise` storage for installed mode.
 - **Inno Setup Upgrade & Uninstaller Hardening (`setup.iss`)**: Proactively terminates active instances and restores physical audio before installation/removal, eliminating Restart Manager prompts and locked file deletion errors.
 - **Expanded Automated Test Suite**: Added 17 new unit and integration tests (32 total), validating CoreAudio COM swapping, atomic configuration, and crash recovery.
 

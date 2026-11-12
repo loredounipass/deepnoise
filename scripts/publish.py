@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-scripts/publish.py — Unified Getsu Automated Release & Publishing Tool
+scripts/publish.py — Unified DeepNoise Automated Release & Publishing Tool
 
 Zero-Mistake Automated Publish Pipeline:
 1. Pre-flight Quality Gate: Runs full unit test suite (107+ tests). Halts immediately if tests fail.
@@ -15,10 +15,10 @@ Zero-Mistake Automated Publish Pipeline:
    - docs/sitemap.xml (lastmod date)
 5. Clean Build & Native Binary Verification:
    - PyInstaller canonical spec build
-   - Verifies dist/getsu/getsu.exe exists and PE ProductVersion matches
+   - Verifies dist/deepnoise/deepnoise.exe exists and PE ProductVersion matches
    - Verifies rnnoise.dll native binary exists and is >= 14 MB (14,825,472 bytes)
    - Inno Setup installer compilation (ISCC.exe setup.iss)
-   - Verifies dist/installer/Getsu-v{version}-Setup.exe exists and is >= 30 MB
+   - Verifies dist/installer/DeepNoise-v{version}-Setup.exe exists and is >= 30 MB
    - Verifies installer Windows PE metadata (ProductVersion, FileVersion, OriginalFilename)
 6. Git Synchronization:
    - Stages and commits synchronized files
@@ -55,20 +55,20 @@ CHANGELOG_MD = REPO_ROOT / "CHANGELOG.md"
 DOCS_INDEX = REPO_ROOT / "docs" / "index.html"
 DOCS_SITEMAP = REPO_ROOT / "docs" / "sitemap.xml"
 SETUP_ISS = REPO_ROOT / "setup.iss"
-SPEC_FILE = REPO_ROOT / "build" / "getsu.spec"
+SPEC_FILE = REPO_ROOT / "build" / "deepnoise.spec"
 VERSION_INFO_TXT = REPO_ROOT / "build" / "version_info.txt"
 VERSION_INFO_CLI_TXT = REPO_ROOT / "build" / "version_info_cli.txt"
-DIST_GETSU_DIR = REPO_ROOT / "dist" / "getsu"
+DIST_DEEPNOISE_DIR = REPO_ROOT / "dist" / "deepnoise"
 DIST_INSTALLER_DIR = REPO_ROOT / "dist" / "installer"
 
 GITHUB_OWNER = "skttr87"
-GITHUB_REPO = "getsu"
+GITHUB_REPO = "deepnoise"
 DEFAULT_GIT_CANDIDATES = [
     r"D:\dev\git\cmd\git.exe",
     shutil.which("git") or "git",
 ]
 DEFAULT_ISCC_PATH = r"D:\dev\inno\app\ISCC.exe"
-DEFAULT_PYENV_PYTHON = r"D:\dev\project\getsu\pyenv\Scripts\python.exe"
+DEFAULT_PYENV_PYTHON = r"D:\dev\project\deepnoise\pyenv\Scripts\python.exe"
 
 
 def find_git_exe() -> str:
@@ -222,7 +222,7 @@ def update_docs_files(version: str) -> bool:
         )
         # downloadUrl in schema.org
         index_text = re.sub(
-            r'("downloadUrl":\s*"https://github\.com/[^/]+/[^/]+/releases/download/)v?[^/]+(/Getsu-)[^/]+(-Setup\.exe")',
+            r'("downloadUrl":\s*"https://github\.com/[^/]+/[^/]+/releases/download/)v?[^/]+(/DeepNoise-)[^/]+(-Setup\.exe")',
             rf'\g<1>v{version}\g<2>v{version}\g<3>',
             index_text
         )
@@ -234,13 +234,13 @@ def update_docs_files(version: str) -> bool:
         )
         # cta download link
         index_text = re.sub(
-            r'(href="https://github\.com/[^/]+/[^/]+/releases/download/)v?[^/]+(/Getsu-)[^/]+(-Setup\.exe" class="btn-download")',
+            r'(href="https://github\.com/[^/]+/[^/]+/releases/download/)v?[^/]+(/DeepNoise-)[^/]+(-Setup\.exe" class="btn-download")',
             rf'\g<1>v{version}\g<2>v{version}\g<3>',
             index_text
         )
         # cta button text
         index_text = re.sub(
-            r'(<span id="download-text">Download Getsu )v?[^ ]+(\s*\(Setup\.exe\)</span>)',
+            r'(<span id="download-text">Download DeepNoise )v?[^ ]+(\s*\(Setup\.exe\)</span>)',
             rf'\g<1>v{version}\g<2>',
             index_text
         )
@@ -319,7 +319,7 @@ def sync_codebase_versions(version: str) -> bool:
         )
         iss_text = re.sub(
             r'VersionInfoOriginalFileName=.*',
-            r'VersionInfoOriginalFileName=Getsu-v{#MyAppVersion}-Setup.exe',
+            r'VersionInfoOriginalFileName=DeepNoise-v{#MyAppVersion}-Setup.exe',
             iss_text
         )
         if iss_text != orig_iss:
@@ -421,33 +421,33 @@ def verify_pe_metadata(file_path: Path, expected_version: str, expected_filename
 
 def verify_dist_integrity(version: str):
     """Verifies that PyInstaller produced all mandatory native binaries and assets."""
-    print("\n[AUDIT] Verifying PyInstaller staged distribution (dist/getsu)...")
-    getsu_exe = DIST_GETSU_DIR / "getsu.exe"
-    if not getsu_exe.is_file():
-        raise RuntimeError("Staged executable dist/getsu/getsu.exe is missing!")
+    print("\n[AUDIT] Verifying PyInstaller staged distribution (dist/deepnoise)...")
+    deepnoise_exe = DIST_DEEPNOISE_DIR / "deepnoise.exe"
+    if not deepnoise_exe.is_file():
+        raise RuntimeError("Staged executable dist/deepnoise/deepnoise.exe is missing!")
 
     # Check rnnoise.dll
     rnnoise_candidates = [
-        DIST_GETSU_DIR / "_internal" / "src" / "native" / "rnnoise.dll",
-        DIST_GETSU_DIR / "src" / "native" / "rnnoise.dll",
+        DIST_DEEPNOISE_DIR / "_internal" / "src" / "native" / "rnnoise.dll",
+        DIST_DEEPNOISE_DIR / "src" / "native" / "rnnoise.dll",
     ]
     rnnoise_path = next((p for p in rnnoise_candidates if p.is_file()), None)
     if not rnnoise_path:
-        raise RuntimeError("CRITICAL: rnnoise.dll was NOT found in dist/getsu! Check getsu.spec datas.")
+        raise RuntimeError("CRITICAL: rnnoise.dll was NOT found in dist/deepnoise! Check deepnoise.spec datas.")
 
     rnnoise_size = rnnoise_path.stat().st_size
     if rnnoise_size < 14_000_000:
         raise RuntimeError(f"CRITICAL: rnnoise.dll is undersized ({rnnoise_size} bytes). Expected ~14.8 MB.")
     print(f"[AUDIT] [OK] rnnoise.dll confirmed: {rnnoise_size:,} bytes at {rnnoise_path.relative_to(REPO_ROOT)}")
 
-    # Check PE Version on getsu.exe
-    verify_pe_metadata(getsu_exe, expected_version=version, expected_filename="getsu.exe")
+    # Check PE Version on deepnoise.exe
+    verify_pe_metadata(deepnoise_exe, expected_version=version, expected_filename="deepnoise.exe")
 
-    # Check getsu-cli.exe
-    getsu_cli_exe = DIST_GETSU_DIR / "getsu-cli.exe"
-    if not getsu_cli_exe.is_file():
-        raise RuntimeError("Staged CLI executable dist/getsu/getsu-cli.exe is missing!")
-    verify_pe_metadata(getsu_cli_exe, expected_version=version, expected_filename="getsu-cli.exe")
+    # Check deepnoise-cli.exe
+    deepnoise_cli_exe = DIST_DEEPNOISE_DIR / "deepnoise-cli.exe"
+    if not deepnoise_cli_exe.is_file():
+        raise RuntimeError("Staged CLI executable dist/deepnoise/deepnoise-cli.exe is missing!")
+    verify_pe_metadata(deepnoise_cli_exe, expected_version=version, expected_filename="deepnoise-cli.exe")
 
 
 def build_installer(version: str):
@@ -471,7 +471,7 @@ def build_installer(version: str):
         raise RuntimeError("Inno Setup compiler failed.")
 
     # Audit Installer
-    installer_path = DIST_INSTALLER_DIR / f"Getsu-v{version}-Setup.exe"
+    installer_path = DIST_INSTALLER_DIR / f"DeepNoise-v{version}-Setup.exe"
     if not installer_path.is_file():
         raise RuntimeError(f"Expected installer not found at {installer_path}")
 
@@ -483,7 +483,7 @@ def build_installer(version: str):
     verify_pe_metadata(
         installer_path,
         expected_version=version,
-        expected_filename=f"Getsu-v{version}-Setup.exe"
+        expected_filename=f"DeepNoise-v{version}-Setup.exe"
     )
 
 
@@ -548,9 +548,9 @@ def publish_github_release(
         changelog = f"- Maintenance and stability release {tag}."
 
     if not title:
-        title = f"Getsu {tag}"
+        title = f"DeepNoise {tag}"
 
-    body = f"""## What's New in Getsu {tag}
+    body = f"""## What's New in DeepNoise {tag}
 
 {changelog}
 
@@ -566,7 +566,7 @@ def publish_github_release(
     headers = {
         "Authorization": f"token {token}",
         "Accept": "application/vnd.github.v3+json",
-        "User-Agent": "Getsu-Auto-Publisher",
+        "User-Agent": "DeepNoise-Auto-Publisher",
     }
 
     print(f"\n[RELEASE] Target Tag: {tag}")
@@ -671,7 +671,7 @@ def publish_github_release(
 
 def verify_live_api():
     url = f"https://api.github.com/repos/{GITHUB_OWNER}/{GITHUB_REPO}/releases/latest?t={int(time.time())}"
-    req = urllib.request.Request(url, headers={"User-Agent": "Getsu-Checker", "Accept": "application/vnd.github.v3+json"})
+    req = urllib.request.Request(url, headers={"User-Agent": "DeepNoise-Checker", "Accept": "application/vnd.github.v3+json"})
     try:
         with urllib.request.urlopen(req) as resp:
             data = json.loads(resp.read().decode())
@@ -690,7 +690,7 @@ def verify_live_api():
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Unified Getsu Automated Release & Publishing Tool — Zero Mistake Pipeline"
+        description="Unified DeepNoise Automated Release & Publishing Tool — Zero Mistake Pipeline"
     )
     parser.add_argument("--version", type=str, default=None, help="Explicit target version (e.g. 1.2.8)")
     parser.add_argument("--title", type=str, default=None, help="Custom release title")
@@ -704,7 +704,7 @@ def main():
     version = get_version(args.version)
     tag = f"v{version}"
     print("=" * 60)
-    print(f"  Getsu Zero-Mistake Release Automation — Target: {tag}")
+    print(f"  DeepNoise Zero-Mistake Release Automation — Target: {tag}")
     print("=" * 60)
 
     # 1. Pre-flight Quality Gates
@@ -717,13 +717,13 @@ def main():
     sync_codebase_versions(version)
 
     # 3. Clean Build & Binary Audits (Default: Always Build unless --skip-build)
-    installer_path = DIST_INSTALLER_DIR / f"Getsu-{tag}-Setup.exe"
+    installer_path = DIST_INSTALLER_DIR / f"DeepNoise-{tag}-Setup.exe"
     if not args.skip_build:
         build_installer(version)
     else:
         print("[INFO] Skipping build (--skip-build flag set).")
         if not installer_path.is_file():
-            fallback_path = DIST_INSTALLER_DIR / f"Getsu-Setup.exe"
+            fallback_path = DIST_INSTALLER_DIR / f"DeepNoise-Setup.exe"
             if fallback_path.is_file():
                 installer_path = fallback_path
             else:
@@ -731,7 +731,7 @@ def main():
                 print("Tip: Run without --skip-build to compile automatically.")
                 sys.exit(1)
         # Still audit the existing binary
-        verify_pe_metadata(installer_path, expected_version=version, expected_filename=f"Getsu-{tag}-Setup.exe")
+        verify_pe_metadata(installer_path, expected_version=version, expected_filename=f"DeepNoise-{tag}-Setup.exe")
 
     # 4. Git Synchronization
     if not args.no_git:

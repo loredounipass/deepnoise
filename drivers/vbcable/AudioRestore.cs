@@ -3,11 +3,11 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyTitle("Getsu Audio Endpoint Helper")]
+[assembly: AssemblyTitle("DeepNoise Audio Endpoint Helper")]
 [assembly: AssemblyDescription("Preserves and restores physical speaker endpoints during driver installation.")]
-[assembly: AssemblyCompany("Getsu AI")]
-[assembly: AssemblyProduct("Getsu AI Noise Cancellation")]
-[assembly: AssemblyCopyright("Copyright (c) 2026 Ihsan (@skttr87)")]
+[assembly: AssemblyCompany("DeepNoise AI")]
+[assembly: AssemblyProduct("DeepNoise AI Noise Cancellation")]
+[assembly: AssemblyCopyright("Copyright (c) 2026 loredounipass")]
 [assembly: AssemblyVersion("1.2.0.0")]
 [assembly: AssemblyFileVersion("1.2.0.0")]
 
