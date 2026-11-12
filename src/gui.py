@@ -2087,12 +2087,7 @@ class DeepNoiseGUI:
                 dpg.add_text("Created by loredounipass", color=[85, 102, 125], tag="footer_creator_text")
                 dpg.add_spacer(width=12)
 
-                dpg.add_button(
-                    label="Follow Me",
-                    tag="footer_follow_btn",
-                    width=self.s(70),
-                    height=self.s(32),
-                )
+                dpg.add_text("Follow Me", color=[85, 102, 125], tag="footer_follow_text")
 
                 dpg.add_spacer(width=8)
 
