@@ -2085,7 +2085,7 @@ class DeepNoiseGUI:
             # --- FOOTER: CREATOR ---
             with dpg.group(horizontal=True, tag="footer_sponsor_row"):
                 dpg.add_text("Created by loredounipass", color=[85, 102, 125], tag="footer_creator_text")
-                dpg.add_spacer(width=16)
+                dpg.add_spacer(width=8)
 
                 if "tiktok" in self.social_textures:
                     dpg.add_image_button(
@@ -2107,7 +2107,7 @@ class DeepNoiseGUI:
                         height=self.s(32),
                     )
 
-                dpg.add_spacer(width=10)
+                dpg.add_spacer(width=6)
 
                 if "instagram" in self.social_textures:
                     dpg.add_image_button(
@@ -2128,6 +2128,16 @@ class DeepNoiseGUI:
                         width=self.s(85),
                         height=self.s(32),
                     )
+
+                dpg.add_spacer(width=10)
+
+                dpg.add_button(
+                    label="Contact Me",
+                    callback=lambda: webbrowser.open("https://github.com/loredounipass/deepnoise/issues"),
+                    tag="footer_contact_btn",
+                    width=self.s(80),
+                    height=self.s(32),
+                )
 
             # Bind specialized fonts to elements
             if self.font_header:
