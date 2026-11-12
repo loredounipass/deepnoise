@@ -2129,15 +2129,7 @@ class DeepNoiseGUI:
                         height=self.s(32),
                     )
 
-                dpg.add_spacer(width=10)
 
-                dpg.add_button(
-                    label="Contact Me",
-                    callback=lambda: webbrowser.open("https://github.com/loredounipass/deepnoise/issues"),
-                    tag="footer_contact_btn",
-                    width=self.s(80),
-                    height=self.s(32),
-                )
 
             # Bind specialized fonts to elements
             if self.font_header:
