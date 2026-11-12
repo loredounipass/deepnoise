@@ -21,5 +21,6 @@
     "is_swapped": false,
     "original_mic_id": null,
     "auto_route": true,
+    "start_with_windows": true,
     "vad_customized": true
 }

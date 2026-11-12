@@ -33,6 +33,7 @@ DEFAULT_CONFIG: Dict[str, Any] = {
     "is_swapped": False,            # Tracks if Windows default mic is currently CABLE Output
     "original_mic_id": None,        # Stores Windows CoreAudio endpoint GUID string of physical mic
     "auto_route": True,             # Settings toggle: Auto-Route to Apps (switch default mic when active)
+    "start_with_windows": True,     # Auto-launch DeepNoise on Windows startup
 }
 
 import sys

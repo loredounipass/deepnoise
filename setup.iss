@@ -53,6 +53,7 @@ FinishedLabel=Setup has finished installing [name] on your computer.%n%nNotice: 
 
 [Tasks]
 Name: "installvbcable"; Description: "Install VB-Audio Virtual Cable (Recommended: routes clean audio to all voice apps and games)"; GroupDescription: "Virtual Audio Components:"; Flags: checkedonce
+Name: "autostart"; Description: "Launch DeepNoise automatically on Windows startup"; GroupDescription: "Windows Integration:"; Flags: checkedonce
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 Name: "addtopath"; Description: "Add DeepNoise CLI to system PATH (enables running 'deepnoise-cli --clean' in any terminal)"; GroupDescription: "Command-Line Tools:"; Flags: unchecked
 
@@ -60,6 +61,9 @@ Name: "addtopath"; Description: "Add DeepNoise CLI to system PATH (enables runni
 Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"; \
     ValueType: expandsz; ValueName: "Path"; ValueData: "{olddata};{app}"; \
     Tasks: addtopath; Check: NeedsAddPath(ExpandConstant('{app}'))
+Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; \
+    ValueType: string; ValueName: "{#MyAppName}"; ValueData: """{app}\{#MyAppExeName}"""; \
+    Tasks: autostart; Flags: uninsdeletevalue
 
 [Files]
 ; Compiled application files and bundled internal dependencies (preserve existing user config.json on upgrade)

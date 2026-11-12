@@ -51,6 +51,7 @@ from src.dsp import (
 )
 from src.host_api_resolver import resolve_single, selection_hint
 from src.audio_errors import explain_start_error
+from src.autostart import is_autostart_enabled, set_autostart, sync_autostart_with_config
 
 
 # Win32 Constants for System Tray Minimize/Close hook
@@ -283,6 +284,12 @@ class DeepNoiseGUI:
 
         self.config = load_config()
         self.router = SmartMicRouter(self.config)
+        self.is_autostart_active = bool(self.config.get("start_with_windows", True))
+        try:
+            sync_autostart_with_config(self.config)
+            self.is_autostart_active = is_autostart_enabled()
+        except Exception:
+            pass
         self.mic_boost_db = int(self.config.get("mic_boost_db", 0))
         self.engine: Optional[AudioEngine] = None
         self.is_running = False
@@ -777,6 +784,10 @@ class DeepNoiseGUI:
             curr = bool(self.config.get("music_mode", False))
             self.on_music_mode_toggled(tag, not curr)
             self._update_toggle_ui(tag, bool(self.config.get("music_mode", False)))
+        elif tag == "chk_autostart":
+            curr = getattr(self, "is_autostart_active", False)
+            self.on_autostart_toggled(tag, not curr)
+            self._update_toggle_ui(tag, self.is_autostart_active)
 
     def _add_toggle_row(self, tag: str, label: str, initial_value: bool, on_click):
         """Builds a modern toggle switch row with responsive hit area."""
@@ -859,6 +870,25 @@ class DeepNoiseGUI:
                 decay = float(self.config.get("vad_decay_ms", 80.0))
                 self.engine.gate.hangover_frames = int(hangover / 10.0)
                 self.engine.gate.decay_rate = math.exp(-10.0 / decay)
+
+    def on_autostart_toggled(self, sender, app_data):
+        """Toggles automatic launch on Windows startup via HKCU Run registry key."""
+        target = bool(app_data)
+        success = set_autostart(target)
+        if success:
+            self.is_autostart_active = target
+            self.config["start_with_windows"] = target
+            save_config(self.config)
+            print(f"[CONFIG] Start with Windows set to: {target}")
+            if getattr(self, '_ui_built', False) is True and dpg.does_item_exist("chk_autostart"):
+                dpg.set_value("chk_autostart", target)
+            self._update_toggle_ui("chk_autostart", target)
+            self.set_status_pill(
+                f"● Windows Startup: {'Enabled' if target else 'Disabled'}",
+                [22, 138, 72] if target else [90, 105, 125]
+            )
+        else:
+            self.set_status_pill("▲ Failed to update Windows Startup setting", [210, 45, 45])
 
     def on_vad_slider_changed(self, sender, app_data):
         """Live thread-safe adjustment of VAD sensitivity without restarting stream."""
@@ -1953,6 +1983,23 @@ class DeepNoiseGUI:
                 label="Music & Singing Mode (Bypasses AI filter, 800ms sustain)",
                 initial_value=self.config.get("music_mode", False),
                 on_click=lambda: self._on_toggle_switch_clicked("chk_music_mode")
+            )
+
+            dpg.add_spacer(height=self.s(6))
+
+            # --- AUTO STARTUP TOGGLE ---
+            dpg.add_checkbox(
+                label="Launch automatically on Windows startup",
+                default_value=self.is_autostart_active,
+                callback=self.on_autostart_toggled,
+                tag="chk_autostart",
+                show=False,
+            )
+            self._add_toggle_row(
+                tag="chk_autostart",
+                label="Launch automatically on Windows startup",
+                initial_value=self.is_autostart_active,
+                on_click=lambda: self._on_toggle_switch_clicked("chk_autostart")
             )
 
             dpg.add_spacer(height=self.s(6))
