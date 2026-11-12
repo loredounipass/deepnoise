@@ -2082,9 +2082,18 @@ class DeepNoiseGUI:
             dpg.add_separator()
             dpg.add_spacer(height=self.s(4))
 
-            # --- FOOTER: CREATOR ---
+# --- FOOTER: CREATOR ---
             with dpg.group(horizontal=True, tag="footer_sponsor_row"):
                 dpg.add_text("Created by loredounipass", color=[85, 102, 125], tag="footer_creator_text")
+                dpg.add_spacer(width=12)
+
+                dpg.add_button(
+                    label="Follow Me",
+                    tag="footer_follow_btn",
+                    width=self.s(70),
+                    height=self.s(32),
+                )
+
                 dpg.add_spacer(width=8)
 
                 if "tiktok" in self.social_textures:
@@ -2107,17 +2116,7 @@ class DeepNoiseGUI:
                         height=self.s(32),
                     )
 
-                dpg.add_spacer(width=6)
-
-                dpg.add_button(
-                    label="Follow Me",
-                    callback=lambda: webbrowser.open("https://github.com/loredounipass/deepnoise"),
-                    tag="footer_follow_btn",
-                    width=self.s(70),
-                    height=self.s(32),
-                )
-
-
+                dpg.add_spacer(width=8)
 
                 if "instagram" in self.social_textures:
                     dpg.add_image_button(
