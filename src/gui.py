@@ -58,6 +58,9 @@ user32 = ctypes.windll.user32
 WNDPROC = ctypes.WINFUNCTYPE(ctypes.c_longlong, wintypes.HWND, wintypes.UINT, wintypes.WPARAM, wintypes.LPARAM)
 GWLP_WNDPROC = -4
 GWL_STYLE = -16
+GWL_EXSTYLE = -20
+WS_EX_LAYERED = 0x00080000
+LWA_ALPHA = 0x00000002
 WM_CLOSE = 0x0010
 WM_SYSCOMMAND = 0x0112
 WM_NCHITTEST = 0x0084
@@ -89,10 +92,30 @@ class WINDOWPOS(ctypes.Structure):
         ("flags", wintypes.UINT),
     ]
 
+
+class ACCENT_POLICY(ctypes.Structure):
+    _fields_ = [
+        ("AccentState", ctypes.c_int),
+        ("AccentFlags", ctypes.c_int),
+        ("GradientColor", ctypes.c_int),
+        ("AnimationId", ctypes.c_int),
+    ]
+
+
+class WINDOWCOMPOSITIONATTRIBDATA(ctypes.Structure):
+    _fields_ = [
+        ("Attrib", ctypes.c_int),
+        ("pvData", ctypes.c_void_p),
+        ("cbData", ctypes.c_size_t),
+    ]
+
+
 user32.SetWindowLongPtrW.argtypes = [wintypes.HWND, ctypes.c_int, ctypes.c_void_p]
 user32.SetWindowLongPtrW.restype = ctypes.c_void_p
 user32.CallWindowProcW.argtypes = [ctypes.c_void_p, wintypes.HWND, wintypes.UINT, wintypes.WPARAM, wintypes.LPARAM]
 user32.CallWindowProcW.restype = ctypes.c_longlong
+user32.SetLayeredWindowAttributes.argtypes = [wintypes.HWND, wintypes.COLORREF, wintypes.BYTE, wintypes.DWORD]
+user32.SetLayeredWindowAttributes.restype = wintypes.BOOL
 
 
 def init_dpi_awareness() -> tuple[int, float]:
@@ -725,17 +748,17 @@ class DeepNoiseGUI:
             knob_r = self.s(6.5)
 
             if is_on:
-                bg_fill = (35, 115, 225)
-                bg_border = (30, 105, 210)
+                bg_fill = (0, 122, 255)
+                bg_border = (0, 105, 225)
                 knob_center = (w - r, r)
                 knob_fill = (255, 255, 255)
-                txt_color = [25, 33, 44]
+                txt_color = [15, 23, 42]
             else:
-                bg_fill = (222, 228, 236)
-                bg_border = (200, 208, 218)
+                bg_fill = (218, 226, 238)
+                bg_border = (195, 206, 220)
                 knob_center = (r, r)
                 knob_fill = (255, 255, 255)
-                txt_color = [95, 110, 130]
+                txt_color = [45, 60, 80]
 
             dpg.configure_item(bg_tag, fill=bg_fill, color=bg_border)
             dpg.configure_item(knob_tag, center=knob_center, fill=knob_fill, color=knob_fill)
@@ -769,17 +792,17 @@ class DeepNoiseGUI:
         handler_tag = f"{tag}_sw_handler"
 
         if initial_value:
-            bg_fill = (35, 115, 225)
-            bg_border = (30, 105, 210)
+            bg_fill = (0, 122, 255)
+            bg_border = (0, 105, 225)
             knob_center = (w - r, r)
             knob_fill = (255, 255, 255)
-            txt_color = [25, 33, 44]
+            txt_color = [15, 23, 42]
         else:
-            bg_fill = (222, 228, 236)
-            bg_border = (200, 208, 218)
+            bg_fill = (218, 226, 238)
+            bg_border = (195, 206, 220)
             knob_center = (r, r)
             knob_fill = (255, 255, 255)
-            txt_color = [95, 110, 130]
+            txt_color = [45, 60, 80]
 
         with dpg.group(horizontal=True, tag=f"{tag}_sw_row"):
             with dpg.drawlist(width=w, height=h, tag=dl_tag):
@@ -1399,6 +1422,30 @@ class DeepNoiseGUI:
         except Exception as e:
             print(f"[WARN] Failed to configure window style: {e}")
 
+        # Enable Apple-style liquid glass transparency & frosted blur behind
+        try:
+            ex_style = user32.GetWindowLongW(self._hwnd, GWL_EXSTYLE)
+            user32.SetWindowLongW(self._hwnd, GWL_EXSTYLE, ex_style | WS_EX_LAYERED)
+            # Alpha 242 (~95% opacity): subtle glass translucency while keeping every text glyph razor-sharp
+            user32.SetLayeredWindowAttributes(self._hwnd, 0, 242, LWA_ALPHA)
+
+            # Apply Windows DWM Blur Behind accent policy
+            accent = ACCENT_POLICY()
+            accent.AccentState = 3  # ACCENT_ENABLE_BLURBEHIND
+            accent.AccentFlags = 2
+            accent.GradientColor = 0xD8FFFFFF  # Frosted crystal white tint
+
+            data = WINDOWCOMPOSITIONATTRIBDATA()
+            data.Attrib = 19  # WCA_ACCENT_POLICY
+            data.pvData = ctypes.cast(ctypes.pointer(accent), ctypes.c_void_p)
+            data.cbData = ctypes.sizeof(accent)
+
+            set_comp = getattr(user32, "SetWindowCompositionAttribute", None)
+            if set_comp:
+                set_comp(self._hwnd, ctypes.byref(data))
+        except Exception as e:
+            print(f"[WARN] Failed to apply glass transparency: {e}")
+
         # Ensure fixed position coordinates are captured
         if not getattr(self, "_lock_window_pos", False) or self._fixed_x is None:
             rect = wintypes.RECT()
@@ -1575,83 +1622,84 @@ class DeepNoiseGUI:
                 self.font_notice = None
                 self.font_small = None
 
-        # Clean White theme with DPI-scaled rounding and padding
+        # Apple Liquid Glass theme with translucent frosted crystal styling
         with dpg.theme() as global_theme:
             with dpg.theme_component(dpg.mvAll):
-                dpg.add_theme_color(dpg.mvThemeCol_WindowBg, (255, 255, 255))
-                dpg.add_theme_color(dpg.mvThemeCol_ChildBg, (246, 248, 251))
-                dpg.add_theme_color(dpg.mvThemeCol_PopupBg, (255, 255, 255))
-                dpg.add_theme_color(dpg.mvThemeCol_Border, (222, 228, 236))
+                dpg.add_theme_color(dpg.mvThemeCol_WindowBg, (250, 252, 255, 238))
+                dpg.add_theme_color(dpg.mvThemeCol_ChildBg, (244, 247, 252, 215))
+                dpg.add_theme_color(dpg.mvThemeCol_PopupBg, (255, 255, 255, 248))
+                dpg.add_theme_color(dpg.mvThemeCol_Border, (212, 224, 238, 190))
                 dpg.add_theme_color(dpg.mvThemeCol_BorderShadow, (0, 0, 0, 0))
-                dpg.add_theme_color(dpg.mvThemeCol_FrameBg, (244, 246, 250))
-                dpg.add_theme_color(dpg.mvThemeCol_FrameBgHovered, (235, 239, 246))
-                dpg.add_theme_color(dpg.mvThemeCol_FrameBgActive, (226, 232, 242))
-                dpg.add_theme_color(dpg.mvThemeCol_TitleBg, (246, 248, 251))
-                dpg.add_theme_color(dpg.mvThemeCol_TitleBgActive, (240, 244, 250))
-                dpg.add_theme_color(dpg.mvThemeCol_TitleBgCollapsed, (246, 248, 251))
-                dpg.add_theme_color(dpg.mvThemeCol_MenuBarBg, (255, 255, 255))
-                dpg.add_theme_color(dpg.mvThemeCol_ScrollbarBg, (248, 250, 252))
-                dpg.add_theme_color(dpg.mvThemeCol_ScrollbarGrab, (205, 213, 224))
-                dpg.add_theme_color(dpg.mvThemeCol_ScrollbarGrabHovered, (180, 192, 208))
-                dpg.add_theme_color(dpg.mvThemeCol_ScrollbarGrabActive, (155, 170, 190))
-                dpg.add_theme_color(dpg.mvThemeCol_CheckMark, (35, 115, 225))
-                dpg.add_theme_color(dpg.mvThemeCol_SliderGrab, (35, 115, 225))
-                dpg.add_theme_color(dpg.mvThemeCol_SliderGrabActive, (25, 95, 200))
-                dpg.add_theme_color(dpg.mvThemeCol_Button, (244, 246, 250))
-                dpg.add_theme_color(dpg.mvThemeCol_ButtonHovered, (232, 237, 244))
-                dpg.add_theme_color(dpg.mvThemeCol_ButtonActive, (220, 227, 236))
-                dpg.add_theme_color(dpg.mvThemeCol_Header, (235, 242, 252))
-                dpg.add_theme_color(dpg.mvThemeCol_HeaderHovered, (220, 232, 250))
-                dpg.add_theme_color(dpg.mvThemeCol_HeaderActive, (200, 220, 245))
-                dpg.add_theme_color(dpg.mvThemeCol_Separator, (225, 230, 238))
-                dpg.add_theme_color(dpg.mvThemeCol_SeparatorHovered, (200, 210, 225))
-                dpg.add_theme_color(dpg.mvThemeCol_SeparatorActive, (175, 190, 210))
-                dpg.add_theme_color(dpg.mvThemeCol_Text, (25, 33, 44))
-                dpg.add_theme_color(dpg.mvThemeCol_TextDisabled, (145, 155, 170))
-                dpg.add_theme_color(dpg.mvThemeCol_TextSelectedBg, (180, 210, 255))
-                dpg.add_theme_style(dpg.mvStyleVar_FrameRounding, self.s(7))
-                dpg.add_theme_style(dpg.mvStyleVar_WindowRounding, self.s(8))
-                dpg.add_theme_style(dpg.mvStyleVar_ChildRounding, self.s(7))
+                dpg.add_theme_color(dpg.mvThemeCol_FrameBg, (240, 244, 251, 210))
+                dpg.add_theme_color(dpg.mvThemeCol_FrameBgHovered, (230, 238, 248, 235))
+                dpg.add_theme_color(dpg.mvThemeCol_FrameBgActive, (220, 230, 245, 245))
+                dpg.add_theme_color(dpg.mvThemeCol_TitleBg, (246, 248, 252, 220))
+                dpg.add_theme_color(dpg.mvThemeCol_TitleBgActive, (240, 244, 250, 240))
+                dpg.add_theme_color(dpg.mvThemeCol_TitleBgCollapsed, (246, 248, 252, 220))
+                dpg.add_theme_color(dpg.mvThemeCol_MenuBarBg, (255, 255, 255, 240))
+                dpg.add_theme_color(dpg.mvThemeCol_ScrollbarBg, (0, 0, 0, 0))
+                dpg.add_theme_color(dpg.mvThemeCol_ScrollbarGrab, (195, 208, 224, 160))
+                dpg.add_theme_color(dpg.mvThemeCol_ScrollbarGrabHovered, (170, 185, 205, 200))
+                dpg.add_theme_color(dpg.mvThemeCol_ScrollbarGrabActive, (145, 162, 185, 220))
+                dpg.add_theme_color(dpg.mvThemeCol_CheckMark, (0, 122, 255))
+                dpg.add_theme_color(dpg.mvThemeCol_SliderGrab, (0, 122, 255))
+                dpg.add_theme_color(dpg.mvThemeCol_SliderGrabActive, (0, 105, 225))
+                dpg.add_theme_color(dpg.mvThemeCol_Button, (242, 246, 252, 210))
+                dpg.add_theme_color(dpg.mvThemeCol_ButtonHovered, (230, 238, 248, 235))
+                dpg.add_theme_color(dpg.mvThemeCol_ButtonActive, (218, 228, 242, 245))
+                dpg.add_theme_color(dpg.mvThemeCol_Header, (232, 242, 255, 190))
+                dpg.add_theme_color(dpg.mvThemeCol_HeaderHovered, (218, 232, 252, 220))
+                dpg.add_theme_color(dpg.mvThemeCol_HeaderActive, (198, 220, 248, 240))
+                dpg.add_theme_color(dpg.mvThemeCol_Separator, (216, 225, 238, 170))
+                dpg.add_theme_color(dpg.mvThemeCol_SeparatorHovered, (195, 208, 225, 200))
+                dpg.add_theme_color(dpg.mvThemeCol_SeparatorActive, (170, 185, 210, 220))
+                dpg.add_theme_color(dpg.mvThemeCol_Text, (15, 23, 42))
+                dpg.add_theme_color(dpg.mvThemeCol_TextDisabled, (120, 135, 155))
+                dpg.add_theme_color(dpg.mvThemeCol_TextSelectedBg, (180, 215, 255, 180))
+                dpg.add_theme_style(dpg.mvStyleVar_FrameRounding, self.s(8))
+                dpg.add_theme_style(dpg.mvStyleVar_WindowRounding, self.s(10))
+                dpg.add_theme_style(dpg.mvStyleVar_ChildRounding, self.s(9))
+                dpg.add_theme_style(dpg.mvStyleVar_GrabRounding, self.s(8))
                 dpg.add_theme_style(dpg.mvStyleVar_FrameBorderSize, 1.0)
                 dpg.add_theme_style(dpg.mvStyleVar_ItemSpacing, self.s(10), self.s(8))
                 dpg.add_theme_style(dpg.mvStyleVar_WindowPadding, self.s(14), self.s(12))
 
-        # Start button theme (Emerald Green with crisp white text)
+        # Start button theme (Apple Spring Green with crisp white text)
         with dpg.theme() as self.theme_start_btn:
             with dpg.theme_component(dpg.mvButton):
-                dpg.add_theme_color(dpg.mvThemeCol_Button, (28, 140, 78))
-                dpg.add_theme_color(dpg.mvThemeCol_ButtonHovered, (34, 165, 92))
-                dpg.add_theme_color(dpg.mvThemeCol_ButtonActive, (22, 115, 64))
+                dpg.add_theme_color(dpg.mvThemeCol_Button, (48, 185, 92))
+                dpg.add_theme_color(dpg.mvThemeCol_ButtonHovered, (56, 205, 102))
+                dpg.add_theme_color(dpg.mvThemeCol_ButtonActive, (38, 160, 78))
                 dpg.add_theme_color(dpg.mvThemeCol_Text, (255, 255, 255))
-                dpg.add_theme_style(dpg.mvStyleVar_FrameRounding, self.s(7))
+                dpg.add_theme_style(dpg.mvStyleVar_FrameRounding, self.s(8))
 
-        # Stop button theme (Crimson Red with crisp white text)
+        # Stop button theme (Apple Crimson Coral with crisp white text)
         with dpg.theme() as self.theme_stop_btn:
             with dpg.theme_component(dpg.mvButton):
-                dpg.add_theme_color(dpg.mvThemeCol_Button, (215, 50, 50))
-                dpg.add_theme_color(dpg.mvThemeCol_ButtonHovered, (235, 65, 65))
-                dpg.add_theme_color(dpg.mvThemeCol_ButtonActive, (185, 40, 40))
+                dpg.add_theme_color(dpg.mvThemeCol_Button, (235, 55, 55))
+                dpg.add_theme_color(dpg.mvThemeCol_ButtonHovered, (250, 70, 70))
+                dpg.add_theme_color(dpg.mvThemeCol_ButtonActive, (205, 40, 40))
                 dpg.add_theme_color(dpg.mvThemeCol_Text, (255, 255, 255))
-                dpg.add_theme_style(dpg.mvStyleVar_FrameRounding, self.s(7))
+                dpg.add_theme_style(dpg.mvStyleVar_FrameRounding, self.s(8))
 
-        # Banner install button theme (Clean Accent Blue with subtle border)
+        # Banner install button theme (Clean Apple Accent with subtle crystal border)
         with dpg.theme() as theme_banner_btn:
             with dpg.theme_component(dpg.mvButton):
-                dpg.add_theme_color(dpg.mvThemeCol_Button, (235, 243, 255))
-                dpg.add_theme_color(dpg.mvThemeCol_ButtonHovered, (222, 235, 255))
-                dpg.add_theme_color(dpg.mvThemeCol_ButtonActive, (205, 225, 250))
-                dpg.add_theme_color(dpg.mvThemeCol_Border, (160, 195, 245))
-                dpg.add_theme_color(dpg.mvThemeCol_Text, (20, 85, 185))
+                dpg.add_theme_color(dpg.mvThemeCol_Button, (235, 243, 255, 230))
+                dpg.add_theme_color(dpg.mvThemeCol_ButtonHovered, (222, 235, 255, 245))
+                dpg.add_theme_color(dpg.mvThemeCol_ButtonActive, (205, 225, 250, 255))
+                dpg.add_theme_color(dpg.mvThemeCol_Border, (155, 195, 248))
+                dpg.add_theme_color(dpg.mvThemeCol_Text, (10, 80, 185))
                 dpg.add_theme_style(dpg.mvStyleVar_FrameBorderSize, 1.0)
-                dpg.add_theme_style(dpg.mvStyleVar_FrameRounding, self.s(6))
+                dpg.add_theme_style(dpg.mvStyleVar_FrameRounding, self.s(7))
 
-        # Status card child window theme (Symmetrical margins and calibrated padding)
+        # Status card child window theme (Frosted glass plate)
         with dpg.theme() as theme_status_card:
             with dpg.theme_component(dpg.mvChildWindow):
-                dpg.add_theme_color(dpg.mvThemeCol_ChildBg, (246, 248, 251))
-                dpg.add_theme_color(dpg.mvThemeCol_Border, (222, 228, 236))
+                dpg.add_theme_color(dpg.mvThemeCol_ChildBg, (244, 247, 252, 215))
+                dpg.add_theme_color(dpg.mvThemeCol_Border, (215, 225, 238, 190))
                 dpg.add_theme_style(dpg.mvStyleVar_WindowPadding, self.s(14), self.s(6))
-                dpg.add_theme_style(dpg.mvStyleVar_ChildRounding, self.s(8))
+                dpg.add_theme_style(dpg.mvStyleVar_ChildRounding, self.s(9))
 
         # Status text group theme (Zero item spacing so spacer sets exact vertical offset)
         with dpg.theme() as theme_status_text_group:
@@ -1664,83 +1712,84 @@ class DeepNoiseGUI:
                 dpg.add_theme_color(dpg.mvThemeCol_Button, (0, 0, 0, 0))
                 dpg.add_theme_color(dpg.mvThemeCol_ButtonHovered, (235, 242, 252, 180))
                 dpg.add_theme_color(dpg.mvThemeCol_ButtonActive, (220, 232, 248, 220))
-                dpg.add_theme_color(dpg.mvThemeCol_Text, (25, 115, 210))
+                dpg.add_theme_color(dpg.mvThemeCol_Text, (0, 122, 255))
 
-        # Boost active button theme (Primary Vibrant Blue with White text)
+        # Boost active button theme (Apple System Blue with White text)
         with dpg.theme() as self.theme_boost_active:
             with dpg.theme_component(dpg.mvButton):
-                dpg.add_theme_color(dpg.mvThemeCol_Button, (35, 115, 225))
-                dpg.add_theme_color(dpg.mvThemeCol_ButtonHovered, (48, 128, 240))
-                dpg.add_theme_color(dpg.mvThemeCol_ButtonActive, (25, 98, 200))
-                dpg.add_theme_color(dpg.mvThemeCol_Border, (35, 115, 225))
+                dpg.add_theme_color(dpg.mvThemeCol_Button, (0, 122, 255))
+                dpg.add_theme_color(dpg.mvThemeCol_ButtonHovered, (25, 140, 255))
+                dpg.add_theme_color(dpg.mvThemeCol_ButtonActive, (0, 105, 225))
+                dpg.add_theme_color(dpg.mvThemeCol_Border, (0, 122, 255))
                 dpg.add_theme_color(dpg.mvThemeCol_Text, (255, 255, 255))
                 dpg.add_theme_style(dpg.mvStyleVar_FrameBorderSize, 1.0)
-                dpg.add_theme_style(dpg.mvStyleVar_FrameRounding, self.s(6))
+                dpg.add_theme_style(dpg.mvStyleVar_FrameRounding, self.s(7))
 
-        # Boost inactive button theme (Light surface with subtle outline and dark slate text)
+        # Boost inactive button theme (Frosted Glass capsule with subtle crystal outline and dark slate text)
         with dpg.theme() as self.theme_boost_inactive:
             with dpg.theme_component(dpg.mvButton):
-                dpg.add_theme_color(dpg.mvThemeCol_Button, (246, 248, 251))
-                dpg.add_theme_color(dpg.mvThemeCol_ButtonHovered, (236, 241, 248))
-                dpg.add_theme_color(dpg.mvThemeCol_ButtonActive, (224, 231, 240))
-                dpg.add_theme_color(dpg.mvThemeCol_Border, (215, 222, 232))
-                dpg.add_theme_color(dpg.mvThemeCol_Text, (60, 75, 95))
+                dpg.add_theme_color(dpg.mvThemeCol_Button, (244, 247, 252, 210))
+                dpg.add_theme_color(dpg.mvThemeCol_ButtonHovered, (234, 240, 248, 235))
+                dpg.add_theme_color(dpg.mvThemeCol_ButtonActive, (222, 230, 240, 245))
+                dpg.add_theme_color(dpg.mvThemeCol_Border, (212, 222, 235, 180))
+                dpg.add_theme_color(dpg.mvThemeCol_Text, (25, 38, 55))
                 dpg.add_theme_style(dpg.mvStyleVar_FrameBorderSize, 1.0)
-                dpg.add_theme_style(dpg.mvStyleVar_FrameRounding, self.s(6))
+                dpg.add_theme_style(dpg.mvStyleVar_FrameRounding, self.s(7))
 
-        # Voice test button theme (Option A: Electric Ocean Blue - Available with White text)
+        # Voice test button theme (Apple System Electric Blue with White text)
         with dpg.theme() as self.theme_voice_btn:
             with dpg.theme_component(dpg.mvButton):
-                dpg.add_theme_color(dpg.mvThemeCol_Button, (40, 115, 220))
-                dpg.add_theme_color(dpg.mvThemeCol_ButtonHovered, (55, 130, 235))
-                dpg.add_theme_color(dpg.mvThemeCol_ButtonActive, (30, 100, 195))
+                dpg.add_theme_color(dpg.mvThemeCol_Button, (0, 122, 255))
+                dpg.add_theme_color(dpg.mvThemeCol_ButtonHovered, (25, 140, 255))
+                dpg.add_theme_color(dpg.mvThemeCol_ButtonActive, (0, 105, 225))
                 dpg.add_theme_color(dpg.mvThemeCol_Text, (255, 255, 255))
-                dpg.add_theme_style(dpg.mvStyleVar_FrameRounding, self.s(6))
+                dpg.add_theme_style(dpg.mvStyleVar_FrameRounding, self.s(7))
 
-        # Voice test button theme (Light Gray - Unavailable while active, dead on hover)
+        # Voice test button theme (Frosted surface - Unavailable while active)
         with dpg.theme() as self.theme_voice_btn_disabled:
             for state in (True, False):
                 with dpg.theme_component(dpg.mvButton, enabled_state=state):
-                    dpg.add_theme_color(dpg.mvThemeCol_Button, (240, 243, 247))
-                    dpg.add_theme_color(dpg.mvThemeCol_ButtonHovered, (240, 243, 247))
-                    dpg.add_theme_color(dpg.mvThemeCol_ButtonActive, (240, 243, 247))
-                    dpg.add_theme_color(dpg.mvThemeCol_Border, (225, 230, 236))
-                    dpg.add_theme_color(dpg.mvThemeCol_Text, (140, 150, 165))
-                    dpg.add_theme_color(dpg.mvThemeCol_TextDisabled, (140, 150, 165))
+                    dpg.add_theme_color(dpg.mvThemeCol_Button, (240, 243, 248, 180))
+                    dpg.add_theme_color(dpg.mvThemeCol_ButtonHovered, (240, 243, 248, 180))
+                    dpg.add_theme_color(dpg.mvThemeCol_ButtonActive, (240, 243, 248, 180))
+                    dpg.add_theme_color(dpg.mvThemeCol_Border, (222, 228, 236, 160))
+                    dpg.add_theme_color(dpg.mvThemeCol_Text, (135, 148, 165))
+                    dpg.add_theme_color(dpg.mvThemeCol_TextDisabled, (135, 148, 165))
                     dpg.add_theme_style(dpg.mvStyleVar_FrameBorderSize, 1.0)
-                    dpg.add_theme_style(dpg.mvStyleVar_FrameRounding, self.s(6))
+                    dpg.add_theme_style(dpg.mvStyleVar_FrameRounding, self.s(7))
 
-        # Unified Modal theme (Clean white background, larger title padding, red close button)
+        # Unified Modal theme (Apple frosted glass modal)
         with dpg.theme() as theme_modal:
             with dpg.theme_component(dpg.mvAll):
-                dpg.add_theme_color(dpg.mvThemeCol_WindowBg, (255, 255, 255))
-                dpg.add_theme_color(dpg.mvThemeCol_TitleBg, (246, 248, 251))
-                dpg.add_theme_color(dpg.mvThemeCol_TitleBgActive, (240, 244, 250))
-                dpg.add_theme_color(dpg.mvThemeCol_TitleBgCollapsed, (246, 248, 251))
-                dpg.add_theme_color(dpg.mvThemeCol_Border, (215, 222, 232))
-                dpg.add_theme_color(dpg.mvThemeCol_Text, (25, 33, 44))
+                dpg.add_theme_color(dpg.mvThemeCol_WindowBg, (255, 255, 255, 250))
+                dpg.add_theme_color(dpg.mvThemeCol_TitleBg, (246, 248, 252, 240))
+                dpg.add_theme_color(dpg.mvThemeCol_TitleBgActive, (240, 244, 250, 250))
+                dpg.add_theme_color(dpg.mvThemeCol_TitleBgCollapsed, (246, 248, 252, 240))
+                dpg.add_theme_color(dpg.mvThemeCol_Border, (212, 222, 235, 200))
+                dpg.add_theme_color(dpg.mvThemeCol_Text, (15, 23, 42))
                 dpg.add_theme_style(dpg.mvStyleVar_FramePadding, self.s(10), self.s(10))
                 dpg.add_theme_style(dpg.mvStyleVar_WindowPadding, self.s(18), self.s(16))
-                dpg.add_theme_style(dpg.mvStyleVar_WindowRounding, self.s(8))
-                dpg.add_theme_color(dpg.mvThemeCol_Button, (215, 50, 50))
-                dpg.add_theme_color(dpg.mvThemeCol_ButtonHovered, (235, 65, 65))
-                dpg.add_theme_color(dpg.mvThemeCol_ButtonActive, (185, 40, 40))
+                dpg.add_theme_style(dpg.mvStyleVar_WindowRounding, self.s(10))
+                dpg.add_theme_color(dpg.mvThemeCol_Button, (235, 55, 55))
+                dpg.add_theme_color(dpg.mvThemeCol_ButtonHovered, (250, 70, 70))
+                dpg.add_theme_color(dpg.mvThemeCol_ButtonActive, (205, 40, 40))
             with dpg.theme_component(dpg.mvButton):
-                dpg.add_theme_color(dpg.mvThemeCol_Button, (215, 50, 50))
-                dpg.add_theme_color(dpg.mvThemeCol_ButtonHovered, (235, 65, 65))
-                dpg.add_theme_color(dpg.mvThemeCol_ButtonActive, (185, 40, 40))
+                dpg.add_theme_color(dpg.mvThemeCol_Button, (235, 55, 55))
+                dpg.add_theme_color(dpg.mvThemeCol_ButtonHovered, (250, 70, 70))
+                dpg.add_theme_color(dpg.mvThemeCol_ButtonActive, (205, 40, 40))
                 dpg.add_theme_color(dpg.mvThemeCol_Text, (255, 255, 255))
+                dpg.add_theme_style(dpg.mvStyleVar_FrameRounding, self.s(7))
 
-        # Modal secondary/cancel button theme (Clean light surface)
+        # Modal secondary/cancel button theme (Frosted glass light surface)
         with dpg.theme() as theme_secondary_btn:
             with dpg.theme_component(dpg.mvButton):
-                dpg.add_theme_color(dpg.mvThemeCol_Button, (246, 248, 251))
-                dpg.add_theme_color(dpg.mvThemeCol_ButtonHovered, (235, 240, 248))
-                dpg.add_theme_color(dpg.mvThemeCol_ButtonActive, (224, 231, 240))
-                dpg.add_theme_color(dpg.mvThemeCol_Border, (210, 218, 228))
-                dpg.add_theme_color(dpg.mvThemeCol_Text, (60, 75, 95))
+                dpg.add_theme_color(dpg.mvThemeCol_Button, (244, 247, 252, 210))
+                dpg.add_theme_color(dpg.mvThemeCol_ButtonHovered, (234, 240, 248, 235))
+                dpg.add_theme_color(dpg.mvThemeCol_ButtonActive, (222, 230, 240, 245))
+                dpg.add_theme_color(dpg.mvThemeCol_Border, (210, 220, 232, 180))
+                dpg.add_theme_color(dpg.mvThemeCol_Text, (35, 50, 70))
                 dpg.add_theme_style(dpg.mvStyleVar_FrameBorderSize, 1.0)
-                dpg.add_theme_style(dpg.mvStyleVar_FrameRounding, self.s(6))
+                dpg.add_theme_style(dpg.mvStyleVar_FrameRounding, self.s(7))
 
         dpg.bind_theme(global_theme)
 
@@ -1762,8 +1811,8 @@ class DeepNoiseGUI:
                         if self.has_icon_texture:
                             dpg.add_image("app_icon_texture", width=self.s(22), height=self.s(22))
                             dpg.add_spacer(width=self.s(3))
-                        dpg.add_text("DEEPNOISE - AI NOISE CANCELLATION", color=[18, 24, 38], tag="header_title_text")
-                    dpg.add_text("[ STOPPED ]", tag="status_badge_text", color=[210, 45, 45])
+                        dpg.add_text("DEEPNOISE - AI NOISE CANCELLATION", color=[12, 20, 35], tag="header_title_text")
+                    dpg.add_text("[ STOPPED ]", tag="status_badge_text", color=[225, 45, 45])
 
             dpg.add_spacer(height=self.s(3))
 
@@ -1778,7 +1827,7 @@ class DeepNoiseGUI:
                             dpg.add_text(
                                 "Virtual Mic Status",
                                 tag="banner_text",
-                                color=[22, 138, 72]
+                                color=[18, 140, 68]
                             )
                         with dpg.group(tag="status_btn_group"):
                             dpg.add_button(
@@ -1806,7 +1855,7 @@ class DeepNoiseGUI:
             dpg.add_spacer(height=self.s(3))
 
             # --- INPUT DEVICE SELECTION ---
-            dpg.add_text("Microphone Input:", color=[50, 62, 78])
+            dpg.add_text("Microphone Input:", color=[25, 38, 55])
             combo_items = list(self.device_map.keys())
             dpg.add_combo(
                 items=combo_items,
@@ -1821,7 +1870,7 @@ class DeepNoiseGUI:
 
 
             # --- MICROPHONE BOOST (0, 5, 10, 15 dB) ---
-            dpg.add_text("Microphone Boost:", color=[50, 62, 78])
+            dpg.add_text("Microphone Boost:", color=[25, 38, 55])
             with dpg.table(header_row=False, policy=dpg.mvTable_SizingStretchSame):
                 dpg.add_table_column(init_width_or_weight=1.0)
                 dpg.add_table_column(init_width_or_weight=1.0)
@@ -1860,7 +1909,7 @@ class DeepNoiseGUI:
             dpg.add_spacer(height=self.s(5))
 
             # --- VOICE SENSITIVITY THRESHOLD SLIDER ---
-            dpg.add_text("Voice Sensitivity Threshold:", color=[50, 62, 78])
+            dpg.add_text("Voice Sensitivity Threshold:", color=[25, 38, 55])
             dpg.add_slider_float(
                 default_value=float(self.config.get("vad_threshold", 0.70)),
                 min_value=0.40,
@@ -1946,7 +1995,7 @@ class DeepNoiseGUI:
 
             # --- FOOTER: CREATOR ---
             with dpg.group(horizontal=True, tag="footer_sponsor_row"):
-                dpg.add_text("Created by loredounipass", color=[125, 140, 160], tag="footer_creator_text")
+                dpg.add_text("Created by loredounipass", color=[85, 102, 125], tag="footer_creator_text")
 
             # Bind specialized fonts to elements
             if self.font_header:
